@@ -1,0 +1,112 @@
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <!--    <meta charset="utf-8">-->
+    <!--    <meta name="viewport" content="width=device-width, initial-scale=1">-->
+    <link rel="icon" type="image/ico" th:href="@{static/images/favicon.ico}">
+    <link href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" rel="stylesheet" >
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+
+    <title>Velvet | Profile</title>
+</head>
+<body style="background-image: url(images/bgLoginImage1.png);">
+<div>
+    <div id="home_button">
+        <button class="btn btn-primary-outline" type="button" onclick="location.href='drive'"></button>
+    </div>
+    <div id="back_button">
+        <button class="btn btn-primary-outline" type="button" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
+    </div>
+    <section class="vh-100">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col col-lg-6 mb-4 mb-lg-0">
+                    <div class="card mb-3" style="border-radius: .5rem; background-color: #f4f5f7 !important;">
+                        <div class="row g-0" th:object="${user}">
+                            <div class="col-md-4 gradient-custom text-center text-white" style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+                                <img
+                                        src="https://github.com/mdo.png"
+                                        alt="Avatar"
+                                        class="img-fluid my-5"
+                                        style="width: 100px; border-radius: 100px"
+                                />
+                                <h5 th:text="${user.fullName}">John Doe</h5>
+                                <p th:text="${user.role.name}">Great User</p>
+                                <a href="" data-bs-toggle="modal" data-bs-target="#updateCredentials"><i class="far fa-edit mb-5"></i></a>
+                                <div style="margin-bottom: 5px" class="text-danger">
+                                    <td th:text="${samePassword} ? 'Passwords are equal, please pick a new one.' : ''"></td>
+                                    <td th:text="${wrongOldPassword} ? 'You\'ve enetered wrong old password. Try again.' : ''"></td>
+                                </div>
+                                <div class="create-form create-form-folder">
+                                    <div id="updateCredentials" class="modal fade" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content modal-update">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel1">Update credentials</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div>
+                                                    <form th:action="@{'/updateProfile'}" th:method="put">
+                                                        <div class="form-group">
+                                                            <input type="text" class="form-control" th:value="${user.fullName}" id="name" name="newName" placeholder="Name">
+                                                            <input type="password" class="form-control" id="oldPassword" name="oldPassword" placeholder="Old password">
+                                                            <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="New password">
+                                                        </div>
+
+                                                        <div class="modal-footer">
+                                                            <button id="update_button" type="submit" class="btn btn-primary">Update</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body p-4">
+                                    <h6>Information</h6>
+                                    <hr class="mt-0 mb-4">
+                                    <div class="row pt-1">
+                                        <div class="col-6 mb-3">
+                                            <h6>Email</h6>
+                                            <p class="text-muted" th:text="${user.email}">info@example.com</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6>Full Name</h6>
+                                            <p class="text-muted" th:text="${user.fullName}">John Doe</p>
+                                        </div>
+                                    </div>
+                                    <h6>Drive</h6>
+                                    <hr class="mt-0 mb-4">
+                                    <div class="row pt-1">
+                                        <div class="col-6 mb-3">
+                                            <h6>Plan</h6>
+                                            <p class="text-muted" th:text="${user.drive.drivePlan.name}">Some plan</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6>Allocated space</h6>
+                                            <p class="text-muted" th:text="${user.drive.drivePlan.space}/1024 + 'MB'">Some space</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-start">
+                                        <div class="page-content page-container" id="page-content">
+                                            <h5><span th:text="${usedSpace}"/>MB of <span th:text="${maxSpace}"/>MB used</h5>
+                                            <div class="progress">
+                                                <div th:style="'width:'+ ${percentage} +'%'" class="progress-bar bg-c-taken-profile"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script src="js/bootstrap.bundle.js"></script>
+
+</body>
+</html>

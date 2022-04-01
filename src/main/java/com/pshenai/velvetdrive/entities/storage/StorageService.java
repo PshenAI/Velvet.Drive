@@ -22,7 +22,6 @@ public class StorageService {
     @Transactional
     public void addStorages(List<Storage> storages){
         storages.forEach(a -> storageRepository.save(a));
-
     }
 
     @Transactional
@@ -32,7 +31,7 @@ public class StorageService {
     }
 
     @Transactional
-    public void updateStorage(String dirPath, Integer maxSpace, Integer availSpace) {
+    public void updateStorage(String dirPath, Long maxSpace, Long availSpace) {
         Storage storage = storageRepository.findByDirPath(dirPath);
         if (storage == null)
             return;

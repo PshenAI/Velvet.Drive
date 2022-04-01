@@ -19,13 +19,13 @@ public class Storage {
     private Long id;
 
     private String dirPath;
-    private Integer maxSpace;
-    private Integer availSpace;
+    private Long maxSpace;
+    private Long availSpace;
 
-    @OneToMany(mappedBy = "storage", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "storage", cascade = CascadeType.PERSIST)
     private List<Drive> driveList = new ArrayList<>();
 
-    public Storage(String dirPath, Integer maxSpace, Integer availSpace) {
+    public Storage(String dirPath, Long maxSpace, Long availSpace) {
         this.dirPath = dirPath;
         this.maxSpace = maxSpace;
         this.availSpace = availSpace;

@@ -20,18 +20,16 @@ public class DriveUser {
     private String passHash;
     @Enumerated(EnumType.STRING)
     private UserRole role;
-    private String name;
-    private String surname;
+    private String fullName;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "driveId")
     private Drive drive;
 
-    public DriveUser(String email, String passHash, UserRole role, String name, String surname) {
+    public DriveUser(String email, String passHash, UserRole role, String fullName) {
         this.email = email;
         this.passHash = passHash;
         this.role = role;
-        this.name = name;
-        this.surname = surname;
+        this.fullName = fullName;
     }
 }

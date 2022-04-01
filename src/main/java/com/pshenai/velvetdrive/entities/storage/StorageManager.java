@@ -4,6 +4,7 @@ import com.pshenai.velvetdrive.entities.drive.Drive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,11 +19,11 @@ public class StorageManager {
         this.storageService = storageService;
     }
 
-    public Boolean setDriveStorage(Drive drive) throws NullPointerException{
+    public void setDriveStorage(Drive drive) throws NullPointerException{
         storages = storageService.getAllStorages();
         Storage res;
         Optional<Storage> optionalStorage = storages.stream().filter(s -> {
-            if(s.getAvailSpace() < drive.getSpaceMax()){
+            if(s.getAvailSpace() < drive.getSpaceLeft()){
                 return false;
             }
             return true;
@@ -31,11 +32,14 @@ public class StorageManager {
             throw new NullPointerException("Unable to find available storage!");
         }
         res = optionalStorage.get();
+        File drivePath = new File(res.getDirPath() + drive.getDriveUser().getEmail());
+        if(!drivePath.mkdir()){
+            System.out.println("Directory problem.");
+        }
         drive.setStorage(res);
-        res.setAvailSpace(res.getAvailSpace() - drive.getSpaceMax());
+        drive.setDrivePath(drivePath.getPath());
+        res.setAvailSpace(res.getAvailSpace() - drive.getSpaceLeft());
         storageService.updateStorage(res.getDirPath(), res.getMaxSpace(), res.getAvailSpace());
-        System.out.println(res.getAvailSpace());
-        return true;
     }
 
     @Override

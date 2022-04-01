@@ -1,38 +1,50 @@
-
 <html>
 <head xmlns:th="http://www.thymeleaf.org" lang="en">
-    <title>Prog.kiev.ua</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-          rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>Velvet | Login</title>
+    <link rel="icon" type="image/ico" th:href="@{static/images/favicon.ico}">
+    <link href="css/styles.css" rel="stylesheet" >
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
 </head>
-<body>
-<div class="w-25 h-30 p-3 mt-5 mx-auto border border-5 border-success rounded text-center">
-
-    <form action="/j_spring_security_check" method="POST">
-        Login:<br/><input class="input-group-text mx-auto" type="text" name="j_login"><br/>
-        Password:<br/><input class="input-group-text mx-auto" type="password" name="j_password"><br/>
-        <input type="submit" class="input-group-text mx-auto bg-success text-white" />
-
-        <p class="monospace bd-primary text-wrap mt-3 mb-2"><a href="/register">Register new user</a></p>
-
-        <div class="starter-template">
-            <p class="monospace bd-primary text-wrap mt-3 mb-2"><a href="/oauth2/authorization/google">Login via Google</a></p>
+<body style="background-image: url(images/bgLoginImage.png);">
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <form action="/j_spring_security_check" method="post" style="margin-top: 250px" class="box">
+                    <h1>Login</h1>
+                    <p class="text-muted"> Please enter your credentials!</p>
+                    <input type="text" name="login" placeholder="Email">
+                    <input type="password" name="password" placeholder="Password">
+                    <!--                    <a class="forgot text-muted" href="#">Forgot password?</a>-->
+                    <input type="submit" value="Login">
+                    <div style="margin-bottom: 5px" class="text-danger">
+                        <td th:text="${error} ? 'Wrong login or password. Please, try again.'"></td>
+                    </div>
+                    <div style="margin-bottom: 5px" class="text-light">
+                        <td th:text="${successRegistration} ? 'Registration was successful!'"></td>
+                        <td th:text="${logout} ? 'Logout was successful.'"></td>
+                    </div>
+                    <div class="col-md-12">
+                        <ul class="social-network social-circle">
+                            <li><a href="/oauth2/authorization/facebook" class="icoFacebook" title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+                            <li><a href="/oauth2/authorization/google" class="icoGoogle" title="Google"><i class="fab fa-google"></i></a></li>
+                            <li><a href="/oauth2/authorization/github" class="icoGithub" title="Github"><i class="fab fa-github"></i></a></li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
         </div>
-
-        <div class="starter-template">
-            <p class="monospace bd-primary text-wrap mt-3 mb-2"><a href="/oauth2/authorization/facebook">Login via Facebook</a></p>
+        <div class="col-md-4-cus">
+            <h1>New Here?</h1>
+            <a href="/register" class="btn btn-info" role="button">Sign Up!</a>
         </div>
-
-        <div class="mb-1">
-            <td th:text="${successRegistration} ? 'Registration was successful!' : ''"></td>
-        </div>
-        <div >
-            <td th:text="${error} ? 'Wrong login or password. Please, try again.' : ''"></td>
-            <td th:text="${logout} ? 'Logout was successful.' : ''"></td>
-        </div>
-    </form>
+    </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="js/bootstrap.bundle.js"></script>
 </body>
+
 </html>

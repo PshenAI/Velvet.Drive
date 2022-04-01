@@ -1,5 +1,6 @@
 package com.pshenai.velvetdrive.entities.user;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -16,6 +17,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserService userService;
 
+    @Autowired
     public UserDetailsServiceImpl(UserService userService) {
         this.userService = userService;
     }

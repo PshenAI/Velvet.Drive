@@ -40,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasAnyRole("USER", "ADMIN")
                 //.antMatchers("/admin") //@PreAuthorize
                 //    .hasRole("ADMIN")
-                .antMatchers("/register")
+                .antMatchers("/register", "static/images/favicon.ico", "/login")
                 .permitAll()
                 .and()
                     .exceptionHandling()
@@ -49,9 +49,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .formLogin()
                 .loginPage("/login")
                 .loginProcessingUrl("/j_spring_security_check")
+                .defaultSuccessUrl("/drive?folderList=true", true)
                 .failureUrl("/login?error=true")
-                .usernameParameter("j_login")
-                .passwordParameter("j_password")
+                .usernameParameter("login")
+                .passwordParameter("password")
                 .permitAll()
                 .and()
                 .oauth2Login()
@@ -61,7 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .logout()
                 .permitAll()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout");
+                .logoutSuccessUrl("/login?logout=true");
 
     }
 
