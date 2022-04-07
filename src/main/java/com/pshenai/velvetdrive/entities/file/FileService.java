@@ -1,46 +1,76 @@
 package com.pshenai.velvetdrive.entities.file;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.pshenai.velvetdrive.configs.BucketName;
 import com.pshenai.velvetdrive.entities.drive.Drive;
 import com.pshenai.velvetdrive.entities.folder.Folder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Random;
+import java.io.InputStream;
+import java.util.*;
 
 @Service
 public class FileService {
 
     private final FileRepository fileRepository;
+    private final AmazonS3 amazonS3;
 
-    public FileService(FileRepository fileRepository) {
+    public FileService(FileRepository fileRepository, AmazonS3 amazonS3) {
         this.fileRepository = fileRepository;
+        this.amazonS3 = amazonS3;
     }
 
     @Transactional
-    public boolean addFile(MultipartFile file, Folder folder, Drive drive) throws IOException {
-        String initialPath = setPath(drive, file);
-        String[] fileName = initialPath.split("\\\\");
-        java.io.File uploadedFile = new java.io.File(initialPath);
-        uploadedFile.createNewFile();
-        byte[] res = file.getBytes();
-        writeByte(res, uploadedFile);
+    public void addFile(MultipartFile file, Folder folder, Drive drive) throws IOException {
+        String[] initialPath = setPathAndName(drive, file);
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("Content-Type", file.getContentType());
+        metadata.put("Content-Length", String.valueOf(file.getSize()));
 
-        String path = uploadedFile.getAbsolutePath();
-        Long fileSize = Files.size(Path.of(path))/1024;
+        Long fileSize = file.getSize()/1024;
         com.pshenai.velvetdrive.entities.file.File driveFile =
-                new com.pshenai.velvetdrive.entities.file.File(fileName[fileName.length-1],
-                       fileSize , path, setBackground(), folder);
+                new com.pshenai.velvetdrive.entities.file.File(initialPath[2],
+                       fileSize , initialPath[1] + "/" + initialPath[2], setBackground(), folder);
+        upload(initialPath[0] + "/" + initialPath[1], initialPath[2], Optional.of(metadata),file.getInputStream());
         fileRepository.save(driveFile);
 
         setFolderSize(folder, fileSize);
         drive.setSpaceLeft(drive.getSpaceLeft() - fileSize);
-        return true;
+    }
+
+    @Transactional
+    public File getFileByName(String email, String fileName){
+        String filePath = email + "/" + fileName;
+        return fileRepository.findByPath(filePath);
+    }
+
+    private void upload(String path,
+                       String fileName,
+                       Optional<Map<String, String>> optionalMetaData,
+                       InputStream inputStream) {
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        optionalMetaData.ifPresent(map -> {
+            if (!map.isEmpty()) {
+                map.forEach(objectMetadata::addUserMetadata);
+            }
+        });
+        try {
+            amazonS3.putObject(path, fileName, inputStream, objectMetadata);
+        } catch (AmazonServiceException e) {
+            throw new IllegalStateException("Failed to upload the file", e);
+        }
+    }
+
+    public S3ObjectInputStream getFileInputStream(String path) {
+        S3Object s3Object = amazonS3.getObject(BucketName.MAIN_BUCKET.getBucketName(), path);
+        return s3Object.getObjectContent();
     }
 
     private void setFolderSize(Folder folder, Long fileSize){
@@ -51,56 +81,28 @@ public class FileService {
         }
     }
 
-    private String setPath(Drive drive, MultipartFile file) {
-        String initialPath = drive.getDrivePath() + "\\" + file.getOriginalFilename();
+    private String[] setPathAndName(Drive drive, MultipartFile file) {
+        String initialPath = drive.getDrivePath() + file.getOriginalFilename();
+        String filePath = drive.getDriveUser().getEmail() + "/" + file.getOriginalFilename();
         int count = 1;
-        if(fileRepository.existsByPath(initialPath)){
+        if(fileRepository.existsByPath(filePath)){
             StringBuilder sb = new StringBuilder();
             do{
                 sb.delete(0, sb.length());
                 sb.append(initialPath);
                 sb.insert(sb.length() - 4, "(" + count + ")");
                 count++;
-            } while(fileRepository.existsByPath(sb.toString()));
-            return sb.toString();
+                String[] temp = sb.toString().split("/");
+                filePath = temp[1] + "/" + temp[2];
+            } while(fileRepository.existsByPath(filePath));
+            initialPath =  sb.toString();
         }
-        return initialPath;
+        return initialPath.split("/");
     }
 
     public static String setBackground(){
-        java.io.File backsRepo = new java.io.File("C:\\Users\\Velvet X\\Documents" +
-                "\\Java Studies\\Java Pro\\VelvetDrive\\src\\main\\resources\\static\\images\\backs");
-        java.io.File[] backs = backsRepo.listFiles();
         Random random = new Random();
         int num = random.nextInt(4);
-        String[] initialPath = backs[num].getAbsolutePath().split("\\\\");
-        int l = initialPath.length;
-        return initialPath[l-3] + "/" + initialPath[l-2] + "/" +initialPath [l-1];
+        return "images/backs/" + num + ".jpg";
     }
-
-
-//    private void imageCheck(File driveFile, java.io.File file){
-//        String fileExtension = file.getAbsolutePath()
-//                .substring(file.getAbsolutePath().length() - 3);
-//
-//        if(fileExtension.equals("jpg") || fileExtension.equals("png")){
-//
-//        } else {
-//            driveFile.setFileBg("images/fileBgs/dummy.jpg");
-//        }
-//    }
-
-    private void writeByte(byte[] bytes, java.io.File file){
-        try {
-            OutputStream os = new FileOutputStream(file);
-            os.write(bytes);
-            os.close();
-        }
-        catch (Exception e) {
-            System.out.println("Exception: " + e);
-        }
-    }
-
-
-
 }

@@ -1,5 +1,7 @@
 package com.pshenai.velvetdrive.entities.folder;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.pshenai.velvetdrive.configs.BucketName;
 import com.pshenai.velvetdrive.entities.drive.Drive;
 import com.pshenai.velvetdrive.entities.file.File;
 import com.pshenai.velvetdrive.entities.file.FileService;
@@ -12,19 +14,23 @@ import java.util.Optional;
 public class FolderService {
 
     private final FolderRepository folderRepository;
+    private final AmazonS3 amazonS3;
 
-    public FolderService(FolderRepository folderRepository) {
+    public FolderService(FolderRepository folderRepository, AmazonS3 amazonS3) {
         this.folderRepository = folderRepository;
+        this.amazonS3 = amazonS3;
     }
 
     @Transactional
     public void deleteFile(String filePath, Long folderId){
-        Optional<Folder> folderOptional = folderRepository.findById(folderId);
-        Optional<File> file = folderOptional.get().getFiles().stream().filter(a -> a.getPath().equals(filePath)).findFirst();
-        folderOptional.get().getFiles().removeIf(a -> a.equals(file.get()));
-        Drive drive = folderOptional.get().getDrive();
+        Folder folder= folderRepository.findById(folderId).get();
+        File file = folder.getFiles().stream().filter(a -> a.getPath().equals(filePath)).findFirst().get();
+        amazonS3.deleteObject(BucketName.MAIN_BUCKET.getBucketName(), file.getPath());
+        folder.getFiles().removeIf(a -> a.equals(file));
+        Drive drive = folder.getDrive();
 
-        drive.setSpaceLeft(drive.getSpaceLeft() + file.get().getFileSize());
+        folder.setFolderSize(folder.getFolderSize() - file.getFileSize());
+        drive.setSpaceLeft(drive.getSpaceLeft() + file.getFileSize());
     }
 
     @Transactional
@@ -43,9 +49,18 @@ public class FolderService {
         if(folderOptional.isPresent()){
             Folder folder = folderOptional.get();
             Drive drive = folder.getDrive();
+            folder.getFiles().forEach(a ->{
+                amazonS3.deleteObject(BucketName.MAIN_BUCKET.getBucketName(), a.getPath());
+            });
             drive.getFolderList().removeIf(a -> a.getId().equals(folderId));
-            folder.deleteAllFiles();
+            drive.setSpaceLeft(drive.getSpaceLeft() + folder.getFolderSize());
             folderRepository.delete(folder);
         }
+    }
+
+    public File getFileByName(String keyName, Folder folder) {
+        Optional<File> file = folder.getFiles().stream()
+                .filter(a -> a.getName().equals(keyName) || a.getName().startsWith(keyName)).findFirst();
+        return file.orElse(null);
     }
 }

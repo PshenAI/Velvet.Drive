@@ -1,5 +1,6 @@
 package com.pshenai.velvetdrive.entities.folder;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.pshenai.velvetdrive.entities.drive.Drive;
 import com.pshenai.velvetdrive.entities.file.File;
 import lombok.Data;
@@ -42,10 +43,6 @@ public class Folder {
         } else {
             return null;
         }
-    }
-
-    public void deleteAllFiles(){
-        files.forEach(File::deleteByPath);
     }
 
     @Override

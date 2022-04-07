@@ -1,16 +1,19 @@
 package com.pshenai.velvetdrive;
 
+import com.pshenai.velvetdrive.configs.BucketName;
 import com.pshenai.velvetdrive.entities.drive.Drive;
+import com.pshenai.velvetdrive.entities.drive.DrivePlan;
 import com.pshenai.velvetdrive.entities.drive.DriveService;
+import com.pshenai.velvetdrive.entities.file.File;
 import com.pshenai.velvetdrive.entities.file.FileService;
 import com.pshenai.velvetdrive.entities.folder.Folder;
 import com.pshenai.velvetdrive.entities.folder.FolderService;
-import com.pshenai.velvetdrive.entities.drive.DrivePlan;
+import com.pshenai.velvetdrive.entities.storage.StorageService;
 import com.pshenai.velvetdrive.entities.user.DriveUser;
 import com.pshenai.velvetdrive.entities.user.UserFactory;
 import com.pshenai.velvetdrive.entities.user.UserRole;
 import com.pshenai.velvetdrive.entities.user.UserService;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -26,9 +29,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class MainController {
@@ -57,24 +60,28 @@ public class MainController {
     @GetMapping("/drive")
     public String drive(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal, Model model,
                         @RequestParam(value = "folder",required = false, defaultValue = "Default") String folderName,
+                        @RequestParam(value = "noFile",required = false, defaultValue = "false") String noFile,
                         @RequestParam(name = "bigFile", required = false, defaultValue = "false") Boolean bigFile,
                         @RequestParam(name = "folderList",required = false, defaultValue = "false") Boolean folderList,
-                        @RequestParam(name = "duplicateFolder",required = false, defaultValue = "false") Boolean dupFolder){
+                        @RequestParam(name = "duplicateFolder",required = false, defaultValue = "false") Boolean dupFolder,
+                        @RequestParam(value = "keyName",required = false, defaultValue = "Default") String keyName){
         DriveUser currentUser = getUser(user, principal);
         Drive currentDrive = currentUser.getDrive();
         Folder currentFolder = getFolder(folderName, currentUser.getEmail());
-        Long[] driveSpaces = spaceAllocator(currentUser);
+        spaceAllocator(currentUser, model);
 
         if(folderList){
             model.addAttribute("folders",currentDrive.getFolderList());
         } else {
-            model.addAttribute("files", currentFolder.getFiles());
+            if(!keyName.equals("Default")){
+                getFilesByKeyName(keyName, currentFolder, model);
+            } else {
+                model.addAttribute("files", currentFolder.getFiles());
+            }
         }
-
-        model.addAttribute("name", currentUser.getFullName());
-        model.addAttribute("maxSpace", driveSpaces[0]);
-        model.addAttribute("usedSpace", driveSpaces[1]);
-        model.addAttribute("percentage", driveSpaces[2]);
+        
+        model.addAttribute("noFile", noFile);
+        model.addAttribute("user", currentUser);
         model.addAttribute("folder", folderName);
         model.addAttribute("bigFile", bigFile);
         model.addAttribute("dupFolder", dupFolder);
@@ -98,13 +105,27 @@ public class MainController {
         return "redirect:/drive?folder=" + currentFolder.getName();
     }
 
+    @GetMapping("/downloadFile")
+    public ResponseEntity<byte[]> getFile(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
+                                          @RequestParam(value = "file") String fileName)
+            throws IOException {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        DriveUser currentUser = getUser(user, principal);
+
+        com.pshenai.velvetdrive.entities.file.File file = fileService.getFileByName(currentUser.getEmail(), fileName);
+        httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        httpHeaders.setContentDispositionFormData("attachment",fileName);
+        return ResponseEntity.ok().headers(httpHeaders)
+                .body(IOUtils.toByteArray(fileService.getFileInputStream(file.getPath())));
+    }
+
     @DeleteMapping("/deleteFile")
     public String deleteFile(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
                              @RequestParam(name = "folder", defaultValue = "Default") String folderName,
                              @RequestParam(name = "file", defaultValue = "Default") String fileName){
         DriveUser currentUser = getUser(user, principal);
         Folder currentFolder = getFolder(folderName, currentUser.getEmail());
-        deleteFile(currentFolder, currentFolder.getFilePath(fileName));
+        folderService.deleteFile(currentFolder.getFilePath(fileName), currentFolder.getId());
 
         return "redirect:/drive?folder=" + currentFolder.getName();
     }
@@ -126,31 +147,73 @@ public class MainController {
                                @RequestParam(name = "folder", defaultValue = "Default") String folderName){
         DriveUser currentUser = getUser(user, principal);
         Folder currentFolder = getFolder(folderName, currentUser.getEmail());
-        deleteFolder(currentFolder);
+        folderService.deleteFolder(currentFolder.getId());
         return "redirect:/drive?folderList=true";
     }
 
-    @GetMapping("/downloadFile")
-    public ResponseEntity<byte[]> getFile(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
-                                          @RequestParam(value = "file") String fileName,
-                                          @RequestParam(value = "folder", defaultValue = "Default") String folderName)
-                                          throws IOException {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        DriveUser currentUser = getUser(user, principal);
-        Folder currentFolder = getFolder(folderName, currentUser.getEmail());
+    @GetMapping("/pricing")
+    public String pricing(Model model){
+         DrivePlan[] plans = DrivePlan.values();
+         model.addAttribute("plans", plans);
+        return "pricing";
+    }
 
-        File file = new File(currentFolder.getFilePath(fileName));
-        httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        httpHeaders.setContentDispositionFormData("attachment",fileName);
-        return ResponseEntity.ok().headers(httpHeaders).body(FileUtils.readFileToByteArray(file));
+    @PostMapping("/pricing/{drivePlan}")
+    public String setPricing(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
+                          @PathVariable DrivePlan drivePlan){
+        DriveUser currentUser = getUser(user, principal);
+        driveService.updateDrivePlan(drivePlan, currentUser.getDrive());
+        return "redirect:/drive?folderList=true";
+    }
+
+    @GetMapping("/profile")
+    public String profile(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal, Model model,
+                          @RequestParam(name = "samePassword", required = false, defaultValue = "false") Boolean samePassword,
+                          @RequestParam(name = "wrongOldPassword", required = false, defaultValue = "false") Boolean wrongOldPassword,
+                          @RequestParam(name = "sameName", required = false, defaultValue = "false") Boolean sameName,
+                          @RequestParam(name = "sameSurname", required = false, defaultValue = "false") Boolean sameSurname){
+        DriveUser currentUser = getUser(user, principal);
+        spaceAllocator(currentUser, model);
+        model.addAttribute("user", currentUser);
+        model.addAttribute("fileNumber", fileCounter(currentUser));
+        model.addAttribute("samePassword", samePassword);
+        model.addAttribute("wrongOldPassword", wrongOldPassword);
+        model.addAttribute("sameName", sameName);
+        model.addAttribute("sameSurname", sameSurname);
+        return "profile";
+    }
+
+    @PutMapping("/updateProfile")
+    public String updateProfile(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal, RedirectAttributes attributes,
+                                @RequestParam(name = "newName", required = false) String newName,
+                                @RequestParam(name = "oldPassword", required = false) String oldPassword,
+                                @RequestParam(name = "newPassword", required = false) String newPassword){
+        DriveUser currentUser = getUser(user, principal);
+        if((!oldPassword.equals("")) && (!newPassword.equals("")) &&
+                !updateCheck(attributes,oldPassword,newPassword,currentUser)){
+            return "redirect:/profile";
+        }
+
+        userService.updateCredentials(currentUser.getId(), passwordEncoder.encode(newPassword), newName);
+
+        return "redirect:/profile";
+    }
+
+    @GetMapping("/about")
+    public String about(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal, Model model){
+        DriveUser currentUser = getUser(user, principal);
+        spaceAllocator(currentUser, model);
+
+        model.addAttribute("user", currentUser);
+
+        return "about";
     }
 
     @GetMapping("/login")
     public String login(@RequestParam(name = "error", required = false, defaultValue = "false") Boolean error,
                         @RequestParam(name = "logout", required = false, defaultValue = "false") Boolean logout,
                         @RequestParam(name = "successRegistration", required = false, defaultValue = "false")
-                                    Boolean successRegistration,
-                        Model model) {
+                                    Boolean successRegistration, Model model) {
         model.addAttribute("error", error);
         model.addAttribute("logout", logout);
         model.addAttribute("successRegistration", successRegistration);
@@ -179,60 +242,9 @@ public class MainController {
         }
 
         String passHash = passwordEncoder.encode(password);
-        factory.createUser(email, passHash, UserRole.USER, fullName);
+        factory.createUser(email, passHash, UserRole.USER, fullName, null);
         attributes.addAttribute("successRegistration", true);
         return "redirect:/login";
-    }
-
-    @GetMapping("/pricing")
-    public String pricing(Model model){
-         DrivePlan[] plans = DrivePlan.values();
-         model.addAttribute("plans", plans);
-        return "pricing";
-    }
-
-    @PostMapping("/pricing/{drivePlan}")
-    public String setPricing(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
-                          @PathVariable DrivePlan drivePlan){
-        DriveUser currentUser = getUser(user, principal);
-        driveService.updateDrivePlan(drivePlan, currentUser.getDrive());
-        return "redirect:/drive?folderList=true";
-    }
-
-    @GetMapping("/profile")
-    public String profile(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal, Model model,
-                          @RequestParam(name = "samePassword", required = false, defaultValue = "false") Boolean samePassword,
-                          @RequestParam(name = "wrongOldPassword", required = false, defaultValue = "false") Boolean wrongOldPassword,
-                          @RequestParam(name = "sameName", required = false, defaultValue = "false") Boolean sameName,
-                          @RequestParam(name = "sameSurname", required = false, defaultValue = "false") Boolean sameSurname){
-        DriveUser currentUser = getUser(user, principal);
-        Long[] driveSpaces = spaceAllocator(currentUser);
-        model.addAttribute("user", currentUser);
-        model.addAttribute("percentage", driveSpaces[2]);
-        model.addAttribute("maxSpace", driveSpaces[0]);
-        model.addAttribute("usedSpace", driveSpaces[1]);
-        model.addAttribute("fileNumber", fileCounter(currentUser));
-        model.addAttribute("samePassword", samePassword);
-        model.addAttribute("wrongOldPassword", wrongOldPassword);
-        model.addAttribute("sameName", sameName);
-        model.addAttribute("sameSurname", sameSurname);
-        return "profile";
-    }
-
-    @PutMapping("/updateProfile")
-    public String updateProfile(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal, RedirectAttributes attributes,
-                                @RequestParam(name = "newName", required = false) String newName,
-                                @RequestParam(name = "oldPassword", required = false) String oldPassword,
-                                @RequestParam(name = "newPassword", required = false) String newPassword){
-        DriveUser currentUser = getUser(user, principal);
-        if((!oldPassword.equals("")) && (!newPassword.equals("")) &&
-                !updateCheck(attributes,oldPassword,newPassword,currentUser)){
-            return "redirect:/profile";
-        }
-
-        userService.updateCredentials(currentUser.getId(), passwordEncoder.encode(newPassword), newName);
-
-        return "redirect:/profile";
     }
 
     private DriveUser getUser(User user, OAuth2User principal) {
@@ -243,37 +255,45 @@ public class MainController {
         }
     }
 
+    private void getFilesByKeyName(String keyName, Folder folder, Model model) {
+        List<File> resList = new ArrayList<>();
+        File file = folderService.getFileByName(keyName, folder);
+        if(file != null){
+            resList.add(file);
+            model.addAttribute("files", resList);
+        } else {
+            model.addAttribute("noSuchFile", true);
+            model.addAttribute("files", folder.getFiles());
+        }
+    }
+
     private Integer fileCounter(DriveUser driveUser){
         Drive drive = driveUser.getDrive();
         return drive.getFolderList().stream().mapToInt(a -> a.getFiles().size()).sum();
     }
 
-    private Long[] spaceAllocator(DriveUser currentUser){
-        Long[] res = new Long[3];
-        res[0] = (currentUser.getDrive().getDrivePlan().getSpace())/1024;
-        res[1] = (currentUser.getDrive().getDrivePlan().getSpace() - currentUser.getDrive().getSpaceLeft())/1024;
+    private void spaceAllocator(DriveUser currentUser, Model model){
+        Long[] driveSpaces = new Long[3];
+        driveSpaces[0] = (currentUser.getDrive().getDrivePlan().getSpace())/1024;
+        driveSpaces[1] = (currentUser.getDrive().getDrivePlan().getSpace() - currentUser.getDrive().getSpaceLeft())/1024;
 
         Long spaceMax = currentUser.getDrive().getDrivePlan().getSpace();
         Long spaceLeft = currentUser.getDrive().getSpaceLeft();
-        res[2] = ((spaceMax-spaceLeft)*100)/spaceMax;
+        driveSpaces[2] = ((spaceMax-spaceLeft)*100)/spaceMax;
 
-        return res;
-    }
+        model.addAttribute("percentage", driveSpaces[2]);
+        model.addAttribute("maxSpace", driveSpaces[0]);
+        model.addAttribute("usedSpace", driveSpaces[1]);
 
-    private void deleteFile(Folder folder, String filePath){
-        folderService.deleteFile(filePath, folder.getId());
-        File file = new File(filePath);
-        file.delete();
-    }
-
-    private void deleteFolder(Folder folder){
-        folderService.deleteFolder(folder.getId());
     }
 
     private boolean fileCheck(MultipartFile file, String username, RedirectAttributes attributes){
         boolean verified = true;
         Drive currentDrive = userService.findByEmail(username).getDrive();
-        if(file.getSize()/1024 > currentDrive.getSpaceLeft()){
+        if(file.getSize() == 0){
+            attributes.addAttribute("noFile", true);
+            verified = false;
+        } else if(file.getSize()/1024 > currentDrive.getSpaceLeft()){
             attributes.addAttribute("bigFile", true);
             verified = false;
         }

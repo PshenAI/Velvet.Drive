@@ -1,5 +1,7 @@
 package com.pshenai.velvetdrive.entities.file;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.pshenai.velvetdrive.configs.BucketName;
 import com.pshenai.velvetdrive.entities.folder.Folder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,11 +32,6 @@ public class File {
         this.path = path;
         this.backUrl = backUrl;
         this.folder = folder;
-    }
-
-    public void deleteByPath(){
-        java.io.File file = new java.io.File(path);
-        file.delete();
     }
 
     @Override

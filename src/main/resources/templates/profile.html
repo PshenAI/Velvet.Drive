@@ -25,7 +25,7 @@
                         <div class="row g-0" th:object="${user}">
                             <div class="col-md-4 gradient-custom text-center text-white" style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
                                 <img
-                                        src="https://github.com/mdo.png"
+                                        th:src="${user.pictureUrl}"
                                         alt="Avatar"
                                         class="img-fluid my-5"
                                         style="width: 100px; border-radius: 100px"
@@ -33,14 +33,14 @@
                                 <h5 th:text="${user.fullName}">John Doe</h5>
                                 <p th:text="${user.role.name}">Great User</p>
                                 <a href="" data-bs-toggle="modal" data-bs-target="#updateCredentials"><i class="far fa-edit mb-5"></i></a>
-                                <div style="margin-bottom: 5px" class="text-danger">
-                                    <td th:text="${samePassword} ? 'Passwords are equal, please pick a new one.' : ''"></td>
-                                    <td th:text="${wrongOldPassword} ? 'You\'ve enetered wrong old password. Try again.' : ''"></td>
+                                <div class="text-danger">
+                                    <p th:text="${samePassword} ? 'Passwords are equal, please pick a new one.' : ''"></p>
+                                    <p th:text="${wrongOldPassword} ? 'You\'ve enetered wrong old password. Try again.' : ''"></p>
                                 </div>
                                 <div class="create-form create-form-folder">
                                     <div id="updateCredentials" class="modal fade" tabindex="-1" aria-hidden="true">
                                         <div class="modal-dialog">
-                                            <div class="modal-content modal-update">
+                                            <div class="modal-content modal-custom">
                                                 <div class="modal-header">
                                                     <h5 class="modal-title" id="exampleModalLabel1">Update credentials</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -54,7 +54,7 @@
                                                         </div>
 
                                                         <div class="modal-footer">
-                                                            <button id="update_button" type="submit" class="btn btn-primary">Update</button>
+                                                            <button id="submit_button" type="submit" class="btn btn-primary">Update</button>
                                                         </div>
                                                     </form>
                                                 </div>

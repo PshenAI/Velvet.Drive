@@ -18,21 +18,21 @@ public class Storage {
     @GeneratedValue
     private Long id;
 
-    private String dirPath;
-    private Long maxSpace;
-    private Long availSpace;
+    private String bucketName;
+    private Long spaceMax;
+    private Long spaceTaken;
 
     @OneToMany(mappedBy = "storage", cascade = CascadeType.PERSIST)
     private List<Drive> driveList = new ArrayList<>();
 
-    public Storage(String dirPath, Long maxSpace, Long availSpace) {
-        this.dirPath = dirPath;
-        this.maxSpace = maxSpace;
-        this.availSpace = availSpace;
+    public Storage(String bucketName, Long spaceMax, Long spaceTaken) {
+        this.bucketName = bucketName;
+        this.spaceMax = spaceMax;
+        this.spaceTaken = spaceTaken;
     }
 
     @Override
     public String toString(){
-        return this.getDirPath() + " " + this.getAvailSpace() + " " + this.getMaxSpace();
+        return this.getBucketName() + " " + this.getSpaceTaken() + " " + this.getSpaceMax();
     }
 }

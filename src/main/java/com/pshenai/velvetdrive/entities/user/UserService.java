@@ -14,12 +14,12 @@ public class UserService {
 
     @Transactional
     public boolean addUser(String email, String passHash,
-                           UserRole role, String fullName) {
+                           UserRole role, String fullName, String pictureUrl) {
         if (userRepository.existsByEmail(email)){
             return false;
         }
 
-        DriveUser user = new DriveUser(email, passHash, role, fullName);
+        DriveUser user = new DriveUser(email, passHash, role, fullName,pictureUrl);
         userRepository.save(user);
 
         return true;

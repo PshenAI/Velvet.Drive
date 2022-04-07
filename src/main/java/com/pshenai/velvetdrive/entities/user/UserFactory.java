@@ -1,5 +1,6 @@
 package com.pshenai.velvetdrive.entities.user;
 
+import com.pshenai.velvetdrive.configs.BucketName;
 import com.pshenai.velvetdrive.entities.drive.Drive;
 import com.pshenai.velvetdrive.entities.folder.Folder;
 import com.pshenai.velvetdrive.entities.storage.StorageManager;
@@ -20,13 +21,15 @@ public class UserFactory {
     }
 
     public DriveUser createUser(String email, String passHash,
-                           UserRole role, String fullName){
-        DriveUser user = new DriveUser(email, passHash, role, fullName);
+                           UserRole role, String fullName, String pictureUrl){
+        if(pictureUrl == null) pictureUrl = "https://github.com/mdo.png";
+        DriveUser user = new DriveUser(email, passHash, role, fullName, pictureUrl);
         Drive drive = new Drive(user, DrivePlan.VELVET);
         drive.setSpaceLeft(drive.getDrivePlan().getSpace());
         Folder defFolder = new Folder("Default",drive,"images/backs/default.jpg");
         drive.getFolderList().add(defFolder);
         storageManager.setDriveStorage(drive);
+        drive.setDrivePath(BucketName.MAIN_BUCKET.getBucketName() + "/" + email + "/");
         user.setDrive(drive);
 
         userService.addUser(user);

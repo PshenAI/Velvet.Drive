@@ -9,20 +9,21 @@
         <link href="css/styles.css" rel="stylesheet">
     </head>
 </head>
-<body style="background-image: url(images/bgMainImage.png);">
+<body style="background-image: url(images/bgMainImage.png);" th:object="${user}">
 <header class="p-3 bg-dark text-white">
     <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-end">
-            <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
-                <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search">
+            <form action="/drive" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" style="margin-right: 50px !important;">
+                <input id="search_input" name="keyName" th:value="${keyName}" type="search"
+                       class="form-control form-control-dark" placeholder="Search..." aria-label="Search">
+                <button id="search_button" type="submit" class="btn search-button"><i class="fas fa-search"></i></button>
             </form>
             <div class="dropdown">
-                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-                    <strong th:text="${name}">Unknown user!</strong>
+                <a href="" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img th:src="${user.pictureUrl}" alt="" width="32" height="32" class="rounded-circle me-2">
+                    <strong th:text="${user.fullName}">Unknown user!</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-<!--                    <li><a class="dropdown-item" href="#">New project...</a></li>-->
                     <li th:if="${folders == null}"><a href="" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#uploadModal">New file</a></li>
                     <li th:if="${folders != null}"><a href="" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#createFolderModal">New folder</a></li>
                     <li><a class="dropdown-item" href="/profile">Profile</a></li>
@@ -42,28 +43,22 @@
                         <span class="fs-4">Velvet | Drive</span>
                     </a>
                     <hr>
-                    <ul class="nav nav-pills flex-column mb-auto">
-                        <li class="nav-item">
-                            <a href="/drive?folderList=true" class="nav-link active" aria-current="page">
+                    <ul class="nav nav-custom flex-column mb-auto">
+                        <li>
+                            <a href="/drive" class="nav-link text-white">
                                 <i class="fas fa-home"></i>
                                 Drive
                             </a>
                         </li>
-<!--                        <li>-->
-<!--                            <a href="#" class="nav-link text-white">-->
-<!--                                <i class="fas fa-tachometer-alt"></i>-->
-<!--                                Dashboard-->
-<!--                            </a>-->
-<!--                        </li>-->
                         <li>
                             <a href="/drive?folderList=true" class="nav-link text-white">
-                                <i class="fas fa-table"></i>
+                                <i class="fas fa-folder"></i>
                                 Folders
                             </a>
                         </li>
                         <li>
                             <a href="/pricing" class="nav-link text-white">
-                                <i class="fas fa-th"></i>
+                                <i class="fas fa-rocket"></i>
                                 Plans
                             </a>
                         </li>
@@ -71,6 +66,12 @@
                             <a href="/profile" class="nav-link text-white">
                                 <i class="fas fa-user-circle"></i>
                                 Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/about" class="nav-link text-white">
+                                <i class="fas fa-eye"></i>
+                                About
                             </a>
                         </li>
                     </ul>
@@ -95,27 +96,29 @@
                 <h1 th:text="${folder}" style="color: aliceblue">Files</h1>
             </div>
             <div style="margin-bottom: 5px" class="text-danger">
-                <td th:text="${bigFile} ? 'There is not enough space in your drive!'"></td>
+                <p th:text="${bigFile} ? 'There is not enough space in your drive!'"></p>
+                <p th:text="${noFile} ? 'You forgot to choose a file for upload!'"></p>
+                <p th:text="${noSuchFile} ? 'No desired file in the current folder!'"></p>
             </div>
             <div class="row row-cols-1 row-cols-lg-4 align-items-stretch g-4 pb-5">
                 <div class="col" th:each="file: ${files}">
                     <div th:style="'background:linear-gradient(rgba(0, 0, 0, 0.7),rgba(0, 0, 0, 0.7)),url('+ ${file.backUrl} + '),no-repeat center !important; background-size: cover !important;'"
-                         class="card file-card card-cover h-100 overflow-hidden text-white bg-dark rounded-5 shadow-lg">
+                         class="card file-card card-cover overflow-hidden h-100 text-white bg-dark rounded-5 shadow-lg">
+                        <div class="delete-form">
+                            <form th:action="@{'/deleteFile?file=' + ${file.name} + '&folder=' + ${folder} }" th:method="delete">
+                                <div class="input-group mb-3">
+                                    <button type="submit" class="btn"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </form>
+                        </div>
                         <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
-                            <div class="delete-form">
-                                <form th:action="@{'/deleteFile?file=' + ${file.name} + '&folder=' + ${folder} }" th:method="delete">
-                                    <div class="input-group mb-3">
-                                        <button type="submit" class="btn"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </form>
-                            </div>
-                            <h2 th:text="${file.name}" class="pt-3 mt-5 mb-4 display-6 lh-1 fw-bold">Short title, long jacket</h2>
+                            <h2 th:text="${file.name}" class="pt-3 mt-5 mb-4 display-6 lh-1 fw-bold block-name">Short title, long jacket</h2>
                             <ul class="d-flex list-unstyled mt-auto">
                                 <li class="me-auto">
-                                    <img src="https://github.com/mdo.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
+                                    <img th:src="${user.pictureUrl}" width="32" height="32" class="rounded-circle border border-white">
                                 </li>
                                 <li class="d-flex align-items-center me-3">
-                                    <a th:href="@{'/downloadFile?file=' + ${file.name} + '&folder=' + ${folder} }"><i class="fas fa-download"></i></a>
+                                    <a th:href="@{'/downloadFile?file=' + ${file.name}}"><i class="fas fa-download"></i></a>
                                 </li>
                                 <li class="d-flex align-items-center">
                                     <i class="fas fa-weight-hanging"></i>
@@ -130,7 +133,7 @@
                 <a href="" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fas fa-plus-circle"></i></a>
                 <div id="uploadModal" class="modal fade" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
-                        <div class="modal-content">
+                        <div class="modal-content modal-custom">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="exampleModalLabel">Upload new file</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -156,21 +159,36 @@
                 <td th:text="${dupFolder} ? 'Folder with such a name already exists!'"></td>
             </div>
             <div class="row row-cols-1 row-cols-lg-4 align-items-stretch g-4 pb-5">
-                <div class="col" th:each="folder: ${folders}" th:onclick="|window.location.href='@{/drive(folder=${folder.name})}'|">
+                <div class="col" th:each="folder: ${folders}">
                     <div th:style="'background:linear-gradient(rgba(0, 0, 0, 0.7),rgba(0, 0, 0, 0.7)),url('+ ${folder.backUrl} + '),no-repeat center !important; background-size: cover !important; cursor: pointer;'"
-                         class="card file-card card-cover h-100 overflow-hidden text-white bg-dark rounded-5 shadow-lg">
-                        <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
-                            <div th:if="${folder.name != 'Default'}" class="delete-form">
-                                <form th:action="@{'/deleteFolder?folder=' + ${folder.name}}" th:method="delete">
-                                    <div class="input-group mb-3">
-                                        <button type="submit" class="btn"><i class="fas fa-trash"></i></button>
+                         class="card folder-card card-cover h-100 overflow-hidden text-white bg-dark rounded-5 shadow-lg">
+                        <div th:if="${folder.name != 'Default'}" class="delete-form">
+                            <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content rounded-4 shadow" style="color: #434462">
+                                        <div class="modal-body p-4 text-center">
+                                            <h5 class="mb-0">Are you sure?</h5>
+                                            <p class="mb-0">All files that were stored here will be deleted alongside.</p>
+                                        </div>
+                                        <div class="modal-footer flex-nowrap p-0">
+                                            <form th:action="@{'/deleteFolder?folder=' + ${folder.name}}" th:method="delete">
+                                                <button type="submit" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-right" style="float: left"><strong>Yes, I'm sure!</strong></button>
+                                                <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" data-bs-dismiss="modal">Back</button>
+                                            </form>
+                                        </div>
                                     </div>
-                                </form>
+                                </div>
                             </div>
-                            <h2 th:text="${folder.name}" class="pt-3 mt-5 mb-4 display-6 lh-1 fw-bold">Short title, long jacket</h2>
+                        </div>
+                        <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1"
+                             th:onclick="|window.location.href='@{/drive(folder=${folder.name})}'|">
+                            <h2 th:text="${folder.name}" class="pt-3 mt-5 mb-4 display-6 lh-1 fw-bold block-name">Short title, long jacket</h2>
                             <ul class="d-flex list-unstyled mt-auto">
                                 <li class="me-auto">
-                                    <img src="https://github.com/mdo.png" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
+                                    <img th:src="${user.pictureUrl}" width="32" height="32" class="rounded-circle border border-white">
                                 </li>
                                 <li class="d-flex align-items-center">
                                     <i class="fas fa-weight-hanging"></i>
@@ -186,7 +204,7 @@
                 <a href="" data-bs-toggle="modal" data-bs-target="#createFolderModal"><i class="fas fa-plus-circle"></i></a>
                 <div id="createFolderModal" class="modal fade" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
-                        <div class="modal-content">
+                        <div class="modal-content modal-custom">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="exampleModalLabel1">Create new folder</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -199,8 +217,7 @@
                                     </div>
 
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-primary">Create</button>
+                                        <button id="submit_button" type="submit" class="btn btn-primary">Create</button>
                                     </div>
                                 </form>
                             </div>
@@ -212,11 +229,6 @@
     </div>
 </div>
 
-<!--<script>-->
-<!--    function goToURL(url) {-->
-<!--        location.href = url;-->
-<!--    }-->
-<!--</script>-->
 <script src="js/bootstrap.bundle.js"></script>
 <script src="js/sidebars.js"></script>
 </body>

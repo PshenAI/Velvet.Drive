@@ -33,21 +33,15 @@ public class AppConfig {
                                      final UserFactory factory) {
         return new CommandLineRunner() {
             @Override
-            public void run(String... strings) throws Exception {
-                Storage storage1 = new Storage("D:\\Velvet.DriveStorage1\\",51200L,51200L);
-                Storage storage2 = new Storage("D:\\Velvet.DriveStorage2\\",40960L,40960L);
-                Storage storage3 = new Storage("D:\\Velvet.DriveStorage3\\",30720L,30720L);
-                List<Storage> storages = List.of(storage1, storage2, storage3);
-                storageService.addStorages(storages);
+            public void run(String... strings){
+                Storage mainStorage = new Storage("velvet-drive-storage",1_048_576L,0L);
+                storageService.addStorage(mainStorage);
                 factory.createUser("admin", encoder.encode("admin"),
-                        UserRole.ADMIN, "Velvet Velvetov");
+                        UserRole.ADMIN, "Velvet Velvetov","https://github.com/mdo.png");
                 factory.createUser("user", encoder.encode("user"),
-                        UserRole.USER, "Lavender Lavenderov");
-//                factory.createUser("lexon@test.com", encoder.encode("admin"),
-//                        UserRole.ADMIN, "Velvet", "Velvetov");
-//                factory.createUser("horny@test.com", encoder.encode("user"),
-//                        UserRole.USER, "Lavender", "Lavenderov");
+                        UserRole.USER, "Lavender Lavenderov","https://github.com/mdo.png");
             }
         };
+
     }
 }

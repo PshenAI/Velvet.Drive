@@ -19,26 +19,19 @@ public class StorageService {
         storageRepository.save(storage);
     }
 
-    @Transactional
-    public void addStorages(List<Storage> storages){
-        storages.forEach(a -> storageRepository.save(a));
-    }
 
     @Transactional
     public List<Storage> getAllStorages(){
-        List<Storage> result = storageRepository.findAll();
-        return result;
+        return storageRepository.findAll();
     }
 
     @Transactional
-    public void updateStorage(String dirPath, Long maxSpace, Long availSpace) {
-        Storage storage = storageRepository.findByDirPath(dirPath);
+    public void updateStorageSpace(String bucketName, Long spaceTaken) {
+        Storage storage = storageRepository.findByBucketName(bucketName);
         if (storage == null)
             return;
 
-        storage.setDirPath(dirPath);
-        storage.setAvailSpace(availSpace);
-        storage.setMaxSpace(maxSpace);
+        storage.setSpaceTaken(spaceTaken);
 
         storageRepository.save(storage);
     }
