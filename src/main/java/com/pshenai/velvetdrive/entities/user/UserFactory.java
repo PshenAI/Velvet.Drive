@@ -22,7 +22,7 @@ public class UserFactory {
 
     public DriveUser createUser(String email, String passHash,
                            UserRole role, String fullName, String pictureUrl){
-        if(pictureUrl == null) pictureUrl = "https://github.com/mdo.png";
+        if(pictureUrl == null) pictureUrl = "images/backs/tori.jpg";
         DriveUser user = new DriveUser(email, passHash, role, fullName, pictureUrl);
         Drive drive = new Drive(user, DrivePlan.VELVET);
         drive.setSpaceLeft(drive.getDrivePlan().getSpace());

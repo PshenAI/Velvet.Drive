@@ -347,6 +347,14 @@ a.socialIcon:hover,
     margin: 5px;
 }
 
+.login-input i {
+    font-size: 24px;
+    float: right;
+    margin: -65px 30px;
+    cursor: pointer;
+    color: aliceblue;
+}
+
 .file-card {
     margin: 0 !important;
 }
@@ -464,8 +472,7 @@ background: linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 1
     transition: 0.3s;
 }
 
-.nav-custom li:hover,
-.folder-card:hover {
+.nav-custom li:hover {
     opacity: 0.6;
 }
 

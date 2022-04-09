@@ -53,7 +53,9 @@ public class FolderService {
                 amazonS3.deleteObject(BucketName.MAIN_BUCKET.getBucketName(), a.getPath());
             });
             drive.getFolderList().removeIf(a -> a.getId().equals(folderId));
-            drive.setSpaceLeft(drive.getSpaceLeft() + folder.getFolderSize());
+            if(folder.getFolderSize() != null){
+                drive.setSpaceLeft(drive.getSpaceLeft() + folder.getFolderSize());
+            }
             folderRepository.delete(folder);
         }
     }
