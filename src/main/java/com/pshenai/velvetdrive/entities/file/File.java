@@ -1,7 +1,5 @@
 package com.pshenai.velvetdrive.entities.file;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.pshenai.velvetdrive.configs.BucketName;
 import com.pshenai.velvetdrive.entities.folder.Folder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,14 +17,14 @@ public class File {
     private Long id;
 
     private String name;
-    private Long fileSize;
+    private Double fileSize;
     private String path;
     private String backUrl;
     @ManyToOne
     @JoinColumn(name = "folderId")
     private Folder folder;
 
-    public File(String name, Long fileSize, String path, String backUrl, Folder folder) {
+    public File(String name, Double fileSize, String path, String backUrl, Folder folder) {
         this.name = name;
         this.fileSize = fileSize;
         this.path = path;

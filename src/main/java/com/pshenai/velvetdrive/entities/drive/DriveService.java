@@ -1,6 +1,5 @@
 package com.pshenai.velvetdrive.entities.drive;
 
-import com.pshenai.velvetdrive.entities.user.DriveUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

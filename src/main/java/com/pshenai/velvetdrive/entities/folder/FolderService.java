@@ -8,6 +8,7 @@ import com.pshenai.velvetdrive.entities.file.FileService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -62,7 +63,7 @@ public class FolderService {
 
     public File getFileByName(String keyName, Folder folder) {
         Optional<File> file = folder.getFiles().stream()
-                .filter(a -> a.getName().equals(keyName) || a.getName().startsWith(keyName)).findFirst();
+                .filter(a -> a.getName().toLowerCase().contains(keyName.toLowerCase())).findFirst();
         return file.orElse(null);
     }
 }

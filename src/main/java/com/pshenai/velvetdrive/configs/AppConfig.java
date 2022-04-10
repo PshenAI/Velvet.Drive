@@ -12,8 +12,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
-
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)

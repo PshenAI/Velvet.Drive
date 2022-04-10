@@ -1,6 +1,5 @@
 package com.pshenai.velvetdrive;
 
-import com.pshenai.velvetdrive.configs.BucketName;
 import com.pshenai.velvetdrive.entities.drive.Drive;
 import com.pshenai.velvetdrive.entities.drive.DrivePlan;
 import com.pshenai.velvetdrive.entities.drive.DriveService;
@@ -8,7 +7,6 @@ import com.pshenai.velvetdrive.entities.file.File;
 import com.pshenai.velvetdrive.entities.file.FileService;
 import com.pshenai.velvetdrive.entities.folder.Folder;
 import com.pshenai.velvetdrive.entities.folder.FolderService;
-import com.pshenai.velvetdrive.entities.storage.StorageService;
 import com.pshenai.velvetdrive.entities.user.DriveUser;
 import com.pshenai.velvetdrive.entities.user.UserFactory;
 import com.pshenai.velvetdrive.entities.user.UserRole;
@@ -30,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -273,13 +272,14 @@ public class MainController {
     }
 
     private void spaceAllocator(DriveUser currentUser, Model model){
-        Long[] driveSpaces = new Long[3];
-        driveSpaces[0] = (currentUser.getDrive().getDrivePlan().getSpace())/1024;
-        driveSpaces[1] = (currentUser.getDrive().getDrivePlan().getSpace() - currentUser.getDrive().getSpaceLeft())/1024;
+        String[] driveSpaces = new String[3];
+        DecimalFormat dFormat = new DecimalFormat("##.#");
+        driveSpaces[0] = dFormat.format((currentUser.getDrive().getDrivePlan().getSpace()));
+        driveSpaces[1] = dFormat.format((currentUser.getDrive().getDrivePlan().getSpace() - currentUser.getDrive().getSpaceLeft()));
 
-        Long spaceMax = currentUser.getDrive().getDrivePlan().getSpace();
-        Long spaceLeft = currentUser.getDrive().getSpaceLeft();
-        driveSpaces[2] = ((spaceMax-spaceLeft)*100)/spaceMax;
+        Double spaceMax = currentUser.getDrive().getDrivePlan().getSpace();
+        Double spaceLeft = currentUser.getDrive().getSpaceLeft();
+        driveSpaces[2] = dFormat.format(((spaceMax-spaceLeft)*100)/spaceMax);
 
         model.addAttribute("percentage", driveSpaces[2]);
         model.addAttribute("maxSpace", driveSpaces[0]);
@@ -293,7 +293,7 @@ public class MainController {
         if(file.getSize() == 0){
             attributes.addAttribute("noFile", true);
             verified = false;
-        } else if(file.getSize()/1024 > currentDrive.getSpaceLeft()){
+        } else if(file.getSize()/1_048_576d > currentDrive.getSpaceLeft()){
             attributes.addAttribute("bigFile", true);
             verified = false;
         }

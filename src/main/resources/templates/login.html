@@ -40,6 +40,28 @@
                     </div>
                 </form>
             </div>
+                <button type="button" style="display: none;" class="btn" data-bs-toggle="modal" data-bs-target="#disModal"></button>
+                <div class="modal hide fade modal-tour" tabindex="-1" role="dialog" id="disModal">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content rounded-6 shadow">
+                            <div class="modal-body p-5">
+                                <h2 class="fw-bold mb-0">Disclaimer!</h2>
+                                <ul class="d-grid gap-4 my-5 list-unstyled">
+                                    <li class="d-flex gap-4">
+                                        <!--<svg class="bi text-muted flex-shrink-0" width="48" height="48"><use xlink:href="#grid-fill"/></svg>-->
+                                        <i class="fas fa-low-vision" style="font-size: 72px;"></i>
+                                        <div>
+                                            <h5 class="mb-0">Website view</h5>
+                                            This site is only for screens larger than 1200px!
+                                            (Laptops and desktops for best experience)
+                                        </div>
+                                    </li>
+                                </ul>
+                                <button type="button" class="btn btn-lg btn-primary mt-5 w-100" data-bs-dismiss="modal">Ok</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
         </div>
         <div class="col-md-4-cus">
             <h1>New Here?</h1>
@@ -51,6 +73,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script src="js/bootstrap.bundle.js"></script>
 <script src="js/toggleVisibility.js"></script>
+<script type="text/javascript">
+    if ($(window).width () < 560) {
+        $(window).on('load', function() {
+            $('#disModal').modal('show');
+        });
+    }
+</script>
 </body>
 
 </html>

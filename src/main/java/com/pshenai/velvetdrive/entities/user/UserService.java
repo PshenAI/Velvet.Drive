@@ -13,25 +13,10 @@ public class UserService {
     }
 
     @Transactional
-    public boolean addUser(String email, String passHash,
-                           UserRole role, String fullName, String pictureUrl) {
-        if (userRepository.existsByEmail(email)){
-            return false;
+    public void addUser(DriveUser driveUser) {
+        if (!userRepository.existsByEmail(driveUser.getEmail())){
+            userRepository.save(driveUser);
         }
-
-        DriveUser user = new DriveUser(email, passHash, role, fullName,pictureUrl);
-        userRepository.save(user);
-
-        return true;
-    }
-
-    @Transactional
-    public boolean addUser(DriveUser driveUser) {
-        if (userRepository.existsByEmail(driveUser.getEmail())){
-            return false;
-        }
-        userRepository.save(driveUser);
-        return true;
     }
 
     @Transactional

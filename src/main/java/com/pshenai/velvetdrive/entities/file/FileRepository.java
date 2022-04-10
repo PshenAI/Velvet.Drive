@@ -8,5 +8,4 @@ public interface FileRepository extends JpaRepository<File, Long> {
 
     boolean existsByPath(String path);
     File findByPath(String path);
-    void deleteByPath(String path);
 }

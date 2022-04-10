@@ -1,6 +1,5 @@
 package com.pshenai.velvetdrive.entities.folder;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.pshenai.velvetdrive.entities.drive.Drive;
 import com.pshenai.velvetdrive.entities.file.File;
 import lombok.Data;
@@ -22,7 +21,7 @@ public class Folder {
     private Long id;
 
     private String name;
-    private Long folderSize;
+    private Double   folderSize;
     private String backUrl;
     @ManyToOne
     @JoinColumn(name = "driveId")

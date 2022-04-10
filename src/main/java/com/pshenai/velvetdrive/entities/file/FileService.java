@@ -14,7 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class FileService {
@@ -33,8 +36,7 @@ public class FileService {
         Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Type", file.getContentType());
         metadata.put("Content-Length", String.valueOf(file.getSize()));
-
-        Long fileSize = file.getSize()/1024;
+        Double fileSize = ((double)file.getSize())/1_048_576;
         com.pshenai.velvetdrive.entities.file.File driveFile =
                 new com.pshenai.velvetdrive.entities.file.File(initialPath[2],
                        fileSize , initialPath[1] + "/" + initialPath[2], setBackground(), folder);
@@ -73,7 +75,7 @@ public class FileService {
         return s3Object.getObjectContent();
     }
 
-    private void setFolderSize(Folder folder, Long fileSize){
+    private void setFolderSize(Folder folder, Double fileSize){
         if(folder.getFolderSize() == null){
             folder.setFolderSize(fileSize);
         } else {

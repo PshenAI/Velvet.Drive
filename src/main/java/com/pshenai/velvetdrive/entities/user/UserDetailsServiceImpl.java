@@ -28,7 +28,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if(user == null)
             throw new UsernameNotFoundException("User with such an email: " + email + " doesn't exist");
 
-        List<GrantedAuthority> roles = Arrays.asList(
+        List<GrantedAuthority> roles = List.of(
                 new SimpleGrantedAuthority(user.getRole().toString()));
 
         return new User(user.getEmail(), user.getPassHash(), roles);

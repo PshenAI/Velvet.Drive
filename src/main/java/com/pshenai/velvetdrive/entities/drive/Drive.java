@@ -28,7 +28,7 @@ public class Drive {
     private Storage storage;
     private String drivePath;
     private DrivePlan drivePlan;
-    private Long spaceLeft;
+    private Double spaceLeft;
     @OneToMany(mappedBy = "drive", cascade = CascadeType.PERSIST)
     private List<Folder> folderList = new ArrayList<>();
 

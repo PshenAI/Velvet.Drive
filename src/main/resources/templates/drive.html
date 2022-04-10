@@ -39,17 +39,11 @@
         <div class="col-md-3" style="margin-top: -70px;">
             <main>
                 <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px;">
-                    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                    <a href="/about" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                         <span class="fs-4">Velvet | Drive</span>
                     </a>
                     <hr>
                     <ul class="nav nav-custom flex-column mb-auto">
-                        <li>
-                            <a href="/drive" class="nav-link text-white">
-                                <i class="fas fa-home"></i>
-                                Drive
-                            </a>
-                        </li>
                         <li>
                             <a href="/drive?folderList=true" class="nav-link text-white">
                                 <i class="fas fa-folder"></i>
@@ -122,7 +116,7 @@
                                 </li>
                                 <li class="d-flex align-items-center">
                                     <i class="fas fa-weight-hanging"></i>
-                                    <small th:text="@{${file.fileSize} + 'KB'}">Size</small>
+                                    <small th:text="@{${#numbers.formatDecimal(file.fileSize,1,1,'POINT')} + 'MB'}">Size</small>
                                 </li>
                             </ul>
                         </div>
@@ -192,8 +186,8 @@
                                 </li>
                                 <li class="d-flex align-items-center">
                                     <i class="fas fa-weight-hanging"></i>
-                                    <small th:if="${folder.folderSize != null}"  th:text="@{${folder.folderSize} + 'KB'}">Size</small>
-                                    <small th:if="${folder.folderSize == null}">0KB</small>
+                                    <small th:if="${folder.folderSize != null}"  th:text="@{${#numbers.formatDecimal(folder.folderSize,1,1,'POINT')} + 'MB'}">Size</small>
+                                    <small th:if="${folder.folderSize == null}">0.0MB</small>
                                 </li>
                             </ul>
                         </div>
