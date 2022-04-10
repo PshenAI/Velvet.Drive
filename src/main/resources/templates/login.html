@@ -12,7 +12,7 @@
 <body style="background-image: url(images/bgLoginImage.png);">
 <div class="container">
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-lg-8">
             <div class="card">
                 <form action="/j_spring_security_check" method="post" style="margin-top: 250px" class="box">
                     <h1>Login</h1>
@@ -46,24 +46,23 @@
                         <div class="modal-content rounded-6 shadow">
                             <div class="modal-body p-5">
                                 <h2 class="fw-bold mb-0">Disclaimer!</h2>
-                                <ul class="d-grid gap-4 my-5 list-unstyled">
+                                <ul class="d-grid gap-4 mt-5 list-unstyled">
                                     <li class="d-flex gap-4">
-                                        <!--<svg class="bi text-muted flex-shrink-0" width="48" height="48"><use xlink:href="#grid-fill"/></svg>-->
                                         <i class="fas fa-low-vision" style="font-size: 72px;"></i>
                                         <div>
                                             <h5 class="mb-0">Website view</h5>
-                                            This site is only for screens larger than 1200px!
-                                            (Laptops and desktops for best experience)
+                                            This site will not render correctly on phones!
+                                            <br><strong>(Laptops and desktops recommended)</strong>
                                         </div>
                                     </li>
                                 </ul>
-                                <button type="button" class="btn btn-lg btn-primary mt-5 w-100" data-bs-dismiss="modal">Ok</button>
+                                <button type="button" class="btn btn-lg btn-primary mt-5 w-100" data-bs-dismiss="modal">OK</button>
                             </div>
                         </div>
                     </div>
                 </div>
         </div>
-        <div class="col-md-4-cus">
+        <div class="col-lg-4 r-banner">
             <h1>New Here?</h1>
             <a href="/register" class="btn btn-info" role="button">Sign Up!</a>
         </div>
@@ -74,7 +73,7 @@
 <script src="js/bootstrap.bundle.js"></script>
 <script src="js/toggleVisibility.js"></script>
 <script type="text/javascript">
-    if ($(window).width () < 560) {
+    if ($(window).width () < 980) {
         $(window).on('load', function() {
             $('#disModal').modal('show');
         });

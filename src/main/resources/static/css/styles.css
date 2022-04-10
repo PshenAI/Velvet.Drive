@@ -20,8 +20,10 @@ main {
 }
 
 ::-webkit-scrollbar-thumb {
-    background-image: linear-gradient(180deg, #188D89 0%, #212529 99%);
+    border: 2px solid transparent;
     border-radius: 100px;
+    background-color: #434462;
+    background-clip: content-box;
 }
 
 .dropdown-toggle { outline: 0; }
@@ -186,21 +188,19 @@ main {
     background: #2ecc71
 }
 
-.col-md-4-cus {
+.r-banner {
     text-align: center;
-    flex: 0 0 auto;
-    width: 33.33333333% !important;
     margin-top: 385px !important;
 }
 
-.col-md-4-cus h1{
+.r-banner h1{
     white-space: normal;
     text-align: center;
     color: #e3fbfd;
     margin-bottom: 40px;
 }
 
-.col-md-4-cus a[role="button"]{
+.r-banner a[role="button"]{
     background: none;
     display: block;
     margin: 40px auto;
@@ -214,7 +214,7 @@ main {
     cursor: pointer
 }
 
-.col-md-4-cus a[role="button"]:hover {
+.r-banner a[role="button"]:hover {
     background: #0dc8ee
 }
 
@@ -331,7 +331,7 @@ a.socialIcon:hover,
 
 .main-div {
     color: #212529;
-    margin-left: -90px;
+    /*margin-left: -90px;*/
     overflow: auto;
     height: 894px;
 }
@@ -514,7 +514,7 @@ background: linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 1
 
 #submit_button {
     margin: auto;
-    width: 300px;
+    width: 240px;
     height: 50px;
     border-radius: 30px;
     background-color: #434462;
@@ -544,7 +544,7 @@ background: linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 1
     width: 100px;
     height: 100px;
     position: absolute;
-    margin: 90px 80px;
+    margin: 90px 0;
 }
 
 #back_button i{

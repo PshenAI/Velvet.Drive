@@ -36,8 +36,8 @@ public class AppConfig {
                 storageService.addStorage(mainStorage);
                 factory.createUser("admin", encoder.encode("admin"),
                         UserRole.ADMIN, "Velvet Velvetov",null);
-                factory.createUser("user", encoder.encode("user"),
-                        UserRole.USER, "Lavender Lavenderov",null);
+//                factory.createUser("user", encoder.encode("user"),
+//                        UserRole.USER, "Lavender Lavenderov",null);
             }
         };
 

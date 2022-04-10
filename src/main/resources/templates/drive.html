@@ -36,7 +36,7 @@
 </header>
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3" style="margin-top: -70px;">
+        <div class="col-md-3 col-xxl-2" style="margin-top: -70px;">
             <main>
                 <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px;">
                     <a href="/about" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
@@ -85,7 +85,7 @@
                 </div>
             </main>
         </div>
-        <div th:if="${folders == null}" class="col-md-9 main-div">
+        <div th:if="${folders == null}" class="col-md-9 col-xxl-10 px-5 main-div">
             <div>
                 <h1 th:text="${folder}" style="color: aliceblue">Files</h1>
             </div>
@@ -94,7 +94,7 @@
                 <p th:text="${noFile} ? 'You forgot to choose a file for upload!'"></p>
                 <p th:text="${noSuchFile} ? 'No desired file in the current folder!'"></p>
             </div>
-            <div class="row row-cols-1 row-cols-lg-4 align-items-stretch g-4 pb-5">
+            <div class="row row-cols-1 row-cols-md-3 row-cols-xxl-4 align-items-stretch g-4 pb-5">
                 <div class="col" th:each="file: ${files}">
                     <div th:style="'background:linear-gradient(rgba(0, 0, 0, 0.7),rgba(0, 0, 0, 0.7)),url('+ ${file.backUrl} + '),no-repeat center !important; background-size: cover !important;'"
                          class="card file-card card-cover overflow-hidden h-100 text-white bg-dark rounded-5 shadow-lg">
@@ -145,14 +145,14 @@
                 </div>
             </div>
         </div>
-        <div th:if="${folders != null}" class="col-md-9 main-div">
+        <div th:if="${folders != null}" class="col-md-9 col-xxl-10 main-div px-5">
             <div>
                 <h1 style="color: aliceblue">Folders</h1>
             </div>
             <div style="margin-bottom: 5px" class="text-danger">
                 <td th:text="${dupFolder} ? 'Folder with such a name already exists!'"></td>
             </div>
-            <div class="row row-cols-1 row-cols-lg-4 align-items-stretch g-4 pb-5">
+            <div class="row row-cols-1 row-cols-md-3 row-cols-xxl-4 align-items-stretch g-4 pb-5">
                 <div class="col" th:each="folder: ${folders}">
                     <div th:style="'background:linear-gradient(rgba(0, 0, 0, 0.7),rgba(0, 0, 0, 0.7)),url('+ ${folder.backUrl} + '),no-repeat center !important; background-size: cover !important; cursor: pointer;'"
                          class="card folder-card card-cover h-100 overflow-hidden text-white bg-dark rounded-5 shadow-lg">

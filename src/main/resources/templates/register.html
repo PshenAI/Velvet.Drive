@@ -11,7 +11,7 @@
 <body style="background-image: url(images/bgLoginImage.png);">
 <div class="container">
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-lg-8">
             <div class="card">
                     <form class="box" th:action="@{/newUser}" method="post">
                         <h1>Registration</h1>
@@ -42,8 +42,29 @@
                         </div>
                     </form>
             </div>
+            <button type="button" style="display: none;" class="btn" data-bs-toggle="modal" data-bs-target="#disModal"></button>
+            <div class="modal hide fade modal-tour" tabindex="-1" role="dialog" id="disModal">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content rounded-6 shadow">
+                        <div class="modal-body p-5">
+                            <h2 class="fw-bold mb-0">Disclaimer!</h2>
+                            <ul class="d-grid gap-4 mt-5 list-unstyled">
+                                <li class="d-flex gap-4">
+                                    <i class="fas fa-low-vision" style="font-size: 72px;"></i>
+                                    <div>
+                                        <h5 class="mb-0">Website view</h5>
+                                        This site will not render correctly on phones!
+                                        <br><strong>(Laptops and desktops recommended)</strong>
+                                    </div>
+                                </li>
+                            </ul>
+                            <button type="button" class="btn btn-lg btn-primary mt-5 w-100" data-bs-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4-cus">
+        <div class="col-lg-4 r-banner">
             <h1 style="color: #e3fbfd;">Already have an account?</h1>
             <a href="/login" class="btn btn-info" role="button">Sign In!</a>
         </div>
@@ -53,6 +74,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script src="js/bootstrap.bundle.js"></script>
 <script src="js/toggleVisibility.js"></script>
+<script type="text/javascript">
+    if ($(window).width () < 980) {
+        $(window).on('load', function() {
+            $('#disModal').modal('show');
+        });
+    }
+</script>
 </body>
 
 </html>
