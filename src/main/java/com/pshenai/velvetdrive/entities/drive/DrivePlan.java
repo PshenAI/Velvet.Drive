@@ -1,9 +1,9 @@
 package com.pshenai.velvetdrive.entities.drive;
 
 public enum DrivePlan {
-    VELVET(30.0, 0.0),
-    COSMOS(50.0, 10.0),
-    OBSIDIAN(100.0, 20.0);
+    VELVET(15.0, 0.0),
+    COSMOS(30.0, 10.0),
+    OBSIDIAN(70.0, 20.0);
 
     private final Double space;
     private final Double price;

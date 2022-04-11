@@ -22,14 +22,14 @@ public class StorageManager {
         storages = storageService.getAllStorages();
         Storage res;
         Optional<Storage> optionalStorage = storages.stream().filter(s -> {
-            return (s.getSpaceMax() - s.getSpaceTaken()) >= 102400L;
+            return (s.getSpaceMax() - s.getSpaceTaken()) >= 71680L;
         }).findFirst();
         if(optionalStorage.isEmpty()){
             throw new NullPointerException("Unable to find available storage!");
         }
         res = optionalStorage.get();
         drive.setStorage(res);
-        res.setSpaceTaken(res.getSpaceTaken() + 102400L);
+        res.setSpaceTaken(res.getSpaceTaken() + 71680L);
         storageService.updateStorageSpace(res.getBucketName(), res.getSpaceTaken());
     }
 

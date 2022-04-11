@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class MainController {
@@ -73,7 +74,7 @@ public class MainController {
             model.addAttribute("folders",currentDrive.getFolderList());
         } else {
             if(!keyName.equals("Default")){
-                getFilesByKeyName(keyName, currentFolder, model);
+                getFilesByKeyName(keyName, currentDrive, model);
             } else {
                 model.addAttribute("files", currentFolder.getFiles());
             }
@@ -234,7 +235,7 @@ public class MainController {
     public String UserRegistration(RedirectAttributes attributes,
                                    @RequestParam(required = false, name = "email") String email,
                                    @RequestParam(required = false, name = "password") String password,
-                                   @RequestParam(required = false, name = "name") String fullName,
+                                   @RequestParam(required = false, name = "fullName") String fullName,
                                    @RequestParam(required = false, name = "confirmPassword") String confirmPassword){
         if(!userCheck(email, attributes, password, confirmPassword)){
             return "redirect:/register";
@@ -254,15 +255,16 @@ public class MainController {
         }
     }
 
-    private void getFilesByKeyName(String keyName, Folder folder, Model model) {
+    private void getFilesByKeyName(String keyName, Drive drive, Model model) {
+        List<Folder> folders = drive.getFolderList();
+        Optional<Folder> resFolder = folders.stream().filter(a -> folderService.getFileByName(keyName, a) != null).findFirst();
         List<File> resList = new ArrayList<>();
-        File file = folderService.getFileByName(keyName, folder);
-        if(file != null){
-            resList.add(file);
+        if(resFolder.isPresent()){
+            resList.add(folderService.getFileByName(keyName, resFolder.get()));
             model.addAttribute("files", resList);
         } else {
             model.addAttribute("noSuchFile", true);
-            model.addAttribute("files", folder.getFiles());
+            model.addAttribute("files", folders.get(0).getFiles());
         }
     }
 

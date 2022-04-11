@@ -13,37 +13,38 @@
     <div class="row">
         <div class="col-lg-8">
             <div class="card">
-                    <form class="box" th:action="@{/newUser}" method="post">
-                        <h1>Registration</h1>
-                        <p class="text-muted"> Please fill all fields!</p>
-                        <p><input type="text" name="email"  placeholder="Email"></p>
-                        <p><input type="text" name="fullName" placeholder="Full name"></p>
-                        <p class="login-input">
-                            <input id="password" type="password"  name="password" placeholder="Password">
-                            <i style="margin: -55px 25px;" id="togglePassword" class="bi bi-eye-slash"></i>
-                        </p>
-                        <p><input id="confirmPassword" type="password"  name="confirmPassword" placeholder="Confirm Password"></p>
-    <!--                    <a class="forgot text-muted" href="#">Forgot password?</a>-->
-                        <div style="margin-bottom: 5px" class="text-danger">
-                            <td th:text="${emailExists} ? 'This email is already in use. Please, try another one.':''"></td>
-                            <td th:text="${wrongEmail} ? 'This email is not valid. ' : ''"></td>
-                            <td th:text="${samePassword} ? 'Passwords do not match. Please, try again.' : ''"></td>
-                        </div>
-                        <p><input id="submit" type="submit" value="Sign Up"></p>
-                        <div class="col-md-12">
-                            <ul class="social-network social-circle">
-                                <li><a href="/oauth2/authorization/facebook" class="icoFacebook"
-                                       title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
-                                <li><a href="/oauth2/authorization/google" class="icoGoogle"
-                                       title="Google"><i class="fab fa-google"></i></a></li>
-                                <li><a href="/oauth2/authorization/github" class="icoGithub"
-                                       title="Github"><i class="fab fa-github"></i></a></li>
-                            </ul>
-                        </div>
-                    </form>
+                <form class="box" th:action="@{/newUser}" method="post">
+                    <h1>Registration</h1>
+                    <a href="" class="disModal" data-bs-toggle="modal" data-bs-target="#disModal">
+                        <i class="fas fa-exclamation-circle"></i></a>
+                    <p class="text-muted"> Please fill all fields!</p>
+                    <p><input type="text" name="email"  placeholder="Email"></p>
+                    <p><input type="text" name="fullName" placeholder="Full name"></p>
+                    <p class="login-input">
+                        <input id="password" type="password"  name="password" placeholder="Password">
+                        <i style="margin: -55px 25px;" id="togglePassword" class="bi bi-eye-slash"></i>
+                    </p>
+                    <p><input id="confirmPassword" type="password"  name="confirmPassword" placeholder="Confirm Password"></p>
+                    <!--                    <a class="forgot text-muted" href="#">Forgot password?</a>-->
+                    <div style="margin-bottom: 5px" class="text-danger">
+                        <td th:text="${emailExists} ? 'This email is already in use. Please, try another one.':''"></td>
+                        <td th:text="${wrongEmail} ? 'This email is not valid. ' : ''"></td>
+                        <td th:text="${samePassword} ? 'Passwords do not match. Please, try again.' : ''"></td>
+                    </div>
+                    <p><input id="submit" type="submit" value="Sign Up"></p>
+                    <div class="col-md-12">
+                        <ul class="social-network social-circle">
+                            <li><a href="/oauth2/authorization/facebook" class="icoFacebook"
+                                   title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+                            <li><a href="/oauth2/authorization/google" class="icoGoogle"
+                                   title="Google"><i class="fab fa-google"></i></a></li>
+                            <li><a href="/oauth2/authorization/github" class="icoGithub"
+                                   title="Github"><i class="fab fa-github"></i></a></li>
+                        </ul>
+                    </div>
+                </form>
             </div>
-            <a href="#" style="display: none;" data-bs-toggle="modal" data-bs-target="#disModal"></a>
-            <div class="modal hide modal-tour" tabindex="-1" role="dialog" id="disModal">
+            <div class="modal fade hide modal-tour" tabindex="-1" role="dialog" id="disModal">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content rounded-6 shadow">
                         <div class="modal-body p-5">
@@ -76,7 +77,7 @@
 <script src="js/toggleVisibility.js"></script>
 <script type="text/javascript">
     if ($(window).width () < 980) {
-        $(window).on('load', function() {
+        $(document).ready(function(){
             $('#disModal').modal('show');
         });
     }
