@@ -30,6 +30,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,6 +69,7 @@ public class MainController {
         DriveUser currentUser = getUser(user, principal);
         Drive currentDrive = currentUser.getDrive();
         Folder currentFolder = getFolder(folderName, currentUser.getEmail());
+        System.out.println(currentFolder.getFiles());
         spaceAllocator(currentUser, model);
 
         if(folderList){
@@ -117,6 +119,26 @@ public class MainController {
         httpHeaders.setContentDispositionFormData("attachment",fileName);
         return ResponseEntity.ok().headers(httpHeaders)
                 .body(IOUtils.toByteArray(fileService.getFileInputStream(file.getPath())));
+    }
+
+    @PostMapping("/moveToBin")
+    public String moveToBin(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
+                           @RequestParam(name = "folder", defaultValue = "Default") String folderName,
+                           @RequestParam(name = "file", defaultValue = "Default") String fileName){
+        DriveUser currentUser = getUser(user, principal);
+        Folder currentFolder = getFolder(folderName, currentUser.getEmail());
+        Folder binFolder = getFolder("Bin", currentUser.getEmail());
+        folderService.moveToBin(fileName, binFolder, currentFolder);
+        return "redirect:/drive?folder=" + currentFolder.getName();
+    }
+
+    @PostMapping("/moveFromBin")
+    public String moveFromBin(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
+                            @RequestParam(name = "file", defaultValue = "Default") String fileName){
+        DriveUser currentUser = getUser(user, principal);
+        Folder binFolder = getFolder("Bin", currentUser.getEmail());
+        folderService.moveFromBin(fileName, binFolder, currentUser.getDrive());
+        return "redirect:/drive?folder=" + binFolder.getName();
     }
 
     @DeleteMapping("/deleteFile")
@@ -257,10 +279,12 @@ public class MainController {
 
     private void getFilesByKeyName(String keyName, Drive drive, Model model) {
         List<Folder> folders = drive.getFolderList();
-        Optional<Folder> resFolder = folders.stream().filter(a -> folderService.getFileByName(keyName, a) != null).findFirst();
+//        folders.forEach(a ->);
+        Optional<Folder> resFolder = folders.stream().filter(a -> folderService.getFilesByName(keyName, a) != null).findFirst();
         List<File> resList = new ArrayList<>();
         if(resFolder.isPresent()){
-            resList.add(folderService.getFileByName(keyName, resFolder.get()));
+            File[] resArray = folderService.getFilesByName(keyName, resFolder.get());
+            resList.addAll(Arrays.asList(resArray));
             model.addAttribute("files", resList);
         } else {
             model.addAttribute("noSuchFile", true);

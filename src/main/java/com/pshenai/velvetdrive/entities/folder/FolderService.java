@@ -61,9 +61,45 @@ public class FolderService {
         }
     }
 
-    public File getFileByName(String keyName, Folder folder) {
-        Optional<File> file = folder.getFiles().stream()
-                .filter(a -> a.getName().toLowerCase().contains(keyName.toLowerCase())).findFirst();
-        return file.orElse(null);
+    @Transactional
+    public void moveToBin(String fileName, Folder binFolder, Folder currentFolder) {
+        File beforefile = getFileByName(fileName, currentFolder);
+        File afterFile = new File(fileName, beforefile.getFileSize(), beforefile.getPath(), beforefile.getBackUrl(), binFolder);
+        afterFile.setLastFolder(currentFolder.getName());
+        binFolder.getFiles().add(afterFile);
+        if(binFolder.getFolderSize() != null){
+            binFolder.setFolderSize(binFolder.getFolderSize() + afterFile.getFileSize());
+        } else {
+            binFolder.setFolderSize(afterFile.getFileSize());
+        }
+        currentFolder.setFolderSize(currentFolder.getFolderSize() - beforefile.getFileSize());
+        currentFolder.getFiles().removeIf(a -> a.getName().equals(fileName));
     }
+
+    @Transactional
+    public void moveFromBin(String fileName, Folder binFolder, Drive drive) {
+        File beforefile = getFileByName(fileName, binFolder);
+        Folder toFolder;
+        if(drive.getFolderByName(beforefile.getLastFolder()) != null){
+            toFolder = drive.getFolderByName(beforefile.getLastFolder());
+        } else {
+            toFolder = drive.getFolderByName("Default");
+        }
+
+        if(toFolder.getFolderSize() != null){
+            toFolder.setFolderSize(toFolder.getFolderSize() + beforefile.getFileSize());
+        } else {
+            toFolder.setFolderSize(beforefile.getFileSize());
+        }
+        File afterFile = new File(fileName, beforefile.getFileSize(), beforefile.getPath(), beforefile.getBackUrl(), toFolder);
+        toFolder.getFiles().add(afterFile);
+        binFolder.getFiles().removeIf(a -> a.getName().equals(fileName));
+        binFolder.setFolderSize(binFolder.getFolderSize() - afterFile.getFileSize());
+    }
+
+    public File[] getFilesByName(String keyName, Folder folder) {
+        return (File[]) folder.getFiles().stream()
+                .filter(a -> a.getName().toLowerCase().contains(keyName.toLowerCase())).toArray();
+    }
+
 }

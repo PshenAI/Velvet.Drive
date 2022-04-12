@@ -502,6 +502,14 @@ background: linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 1
     margin: -65px -15px;
 }
 
+.restore-button {
+    color: aliceblue;
+    width: 26px;
+    height: 26px;
+    font-size: 18px;
+    margin: -13px -40px;
+}
+
 #deleteModal form {
     width: 100%;
 }
@@ -555,7 +563,7 @@ background: linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 1
 }
 
 #back_button i{
-    font-size: 84px;
+    font-size: 64px;
     color: #212529;
     opacity: 0.6;
     transition: 0.3s;

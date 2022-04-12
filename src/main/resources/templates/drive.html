@@ -51,6 +51,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="/drive?folder=Bin" class="nav-link text-white">
+                                <i class="fas fa-trash-alt"></i>
+                                Bin
+                            </a>
+                        </li>
+                        <li>
                             <a href="/profile" class="nav-link text-white">
                                 <i class="fas fa-user-circle"></i>
                                 Profile
@@ -99,7 +105,12 @@
                     <div th:style="'background:linear-gradient(rgba(0, 0, 0, 0.7),rgba(0, 0, 0, 0.7)),url('+ ${file.backUrl} + '),no-repeat center !important; background-size: cover !important;'"
                          class="card file-card card-cover overflow-hidden h-100 text-white bg-dark rounded-5 shadow-lg">
                         <div class="delete-form">
-                            <form th:action="@{'/deleteFile?file=' + ${file.name} + '&folder=' + ${folder} }" th:method="delete">
+                            <form th:if="${folder == 'Bin'}" th:action="@{'/deleteFile?file=' + ${file.name} + '&folder=' + ${folder} }" th:method="delete">
+                                <div class="input-group mb-3">
+                                    <button type="submit" class="btn"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </form>
+                            <form th:if="${folder != 'Bin'}" th:action="@{'/moveToBin?file=' + ${file.name} + '&folder=' + ${folder} }" method="post">
                                 <div class="input-group mb-3">
                                     <button type="submit" class="btn"><i class="fas fa-trash"></i></button>
                                 </div>
@@ -112,7 +123,14 @@
                                     <img th:src="${user.pictureUrl}" width="32" height="32" class="rounded-circle border border-white">
                                 </li>
                                 <li class="d-flex align-items-center me-3">
-                                    <a th:href="@{'/downloadFile?file=' + ${file.name}}"><i class="fas fa-download"></i></a>
+                                    <a th:if="${folder != 'Bin'}" th:href="@{'/downloadFile?file=' + ${file.name}}"><i class="fas fa-download"></i></a>
+                                    <div th:if="${folder == 'Bin'}">
+                                        <form th:action="@{'/moveFromBin?file=' + ${file.name}}" method="post">
+                                            <div class="input-group mb-3">
+                                                <button type="submit" class="btn restore-button"><i class="fas fa-trash-restore"></i></button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </li>
                                 <li class="d-flex align-items-center">
                                     <i class="fas fa-weight-hanging"></i>
@@ -153,7 +171,7 @@
                 <td th:text="${dupFolder} ? 'Folder with such a name already exists!'"></td>
             </div>
             <div class="row row-cols-1 row-cols-md-3 row-cols-xxl-4 align-items-stretch g-4 pb-5">
-                <div class="col" th:each="folder: ${folders}">
+                <div class="col" th:each="folder: ${folders}" th:if="${folder.name != 'Bin'}">
                     <div th:style="'background:linear-gradient(rgba(0, 0, 0, 0.7),rgba(0, 0, 0, 0.7)),url('+ ${folder.backUrl} + '),no-repeat center !important; background-size: cover !important; cursor: pointer;'"
                          class="card folder-card card-cover h-100 overflow-hidden text-white bg-dark rounded-5 shadow-lg">
                         <div th:if="${folder.name != 'Default'}" class="delete-form">

@@ -20,6 +20,7 @@ public class File {
     private Double fileSize;
     private String path;
     private String backUrl;
+    private String lastFolder;
     @ManyToOne
     @JoinColumn(name = "folderId")
     private Folder folder;

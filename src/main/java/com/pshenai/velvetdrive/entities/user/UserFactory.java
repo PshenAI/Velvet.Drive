@@ -27,7 +27,9 @@ public class UserFactory {
         Drive drive = new Drive(user, DrivePlan.VELVET);
         drive.setSpaceLeft(drive.getDrivePlan().getSpace());
         Folder defFolder = new Folder("Default",drive,"images/backs/default.jpg");
+        Folder binFolder = new Folder("Bin", drive,null);
         drive.getFolderList().add(defFolder);
+        drive.getFolderList().add(binFolder);
         storageManager.setDriveStorage(drive);
         drive.setDrivePath(BucketName.MAIN_BUCKET.getBucketName() + "/" + email + "/");
         user.setDrive(drive);
