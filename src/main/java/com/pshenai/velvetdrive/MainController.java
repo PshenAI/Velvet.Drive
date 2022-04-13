@@ -69,22 +69,12 @@ public class MainController {
         DriveUser currentUser = getUser(user, principal);
         Drive currentDrive = currentUser.getDrive();
         Folder currentFolder = getFolder(folderName, currentUser.getEmail());
-        System.out.println(currentFolder.getFiles());
         spaceAllocator(currentUser, model);
 
-        if(folderList){
-            model.addAttribute("folders",currentDrive.getFolderList());
-        } else {
-            if(!keyName.equals("Default")){
-                getFilesByKeyName(keyName, currentDrive, model);
-            } else {
-                model.addAttribute("files", currentFolder.getFiles());
-            }
-        }
+        setContent(model, folderList,keyName, currentDrive, currentFolder, folderName);
         
         model.addAttribute("noFile", noFile);
         model.addAttribute("user", currentUser);
-        model.addAttribute("folder", folderName);
         model.addAttribute("bigFile", bigFile);
         model.addAttribute("dupFolder", dupFolder);
         return "drive";
@@ -128,7 +118,10 @@ public class MainController {
         DriveUser currentUser = getUser(user, principal);
         Folder currentFolder = getFolder(folderName, currentUser.getEmail());
         Folder binFolder = getFolder("Bin", currentUser.getEmail());
-        folderService.moveToBin(fileName, binFolder, currentFolder);
+        folderService.moveToBin(fileName, binFolder, currentFolder, currentUser.getDrive());
+        if(currentFolder == null){
+            return "redirect:/drive";
+        }
         return "redirect:/drive?folder=" + currentFolder.getName();
     }
 
@@ -277,18 +270,33 @@ public class MainController {
         }
     }
 
+    private void setContent(Model model, Boolean folderList, String keyName, Drive currentDrive, Folder currentFolder,
+                            String folderName) {
+        if(folderList){
+            model.addAttribute("folders",currentDrive.getFolderList());
+        } else {
+            if(!keyName.equals("Default")){
+                getFilesByKeyName(keyName, currentDrive, model);
+                folderName = "Results for query: " + keyName;
+            } else {
+                model.addAttribute("files", currentFolder.getFiles());
+            }
+        }
+        model.addAttribute("folder", folderName);
+    }
+
     private void getFilesByKeyName(String keyName, Drive drive, Model model) {
         List<Folder> folders = drive.getFolderList();
-//        folders.forEach(a ->);
-        Optional<Folder> resFolder = folders.stream().filter(a -> folderService.getFilesByName(keyName, a) != null).findFirst();
+        folders = folders.stream().filter(a -> folderService.fileExistsByKeyname(keyName, a) != null).toList();
         List<File> resList = new ArrayList<>();
-        if(resFolder.isPresent()){
-            File[] resArray = folderService.getFilesByName(keyName, resFolder.get());
-            resList.addAll(Arrays.asList(resArray));
+        if(folders != null){
+            folders.forEach(a ->{
+                resList.addAll(folderService.getFilesByKeyname(keyName, a));
+            });
             model.addAttribute("files", resList);
         } else {
             model.addAttribute("noSuchFile", true);
-            model.addAttribute("files", folders.get(0).getFiles());
+            model.addAttribute("files", drive.getFolderList().get(0).getFiles());
         }
     }
 

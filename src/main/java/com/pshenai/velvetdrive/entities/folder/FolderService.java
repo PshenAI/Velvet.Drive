@@ -8,6 +8,7 @@ import com.pshenai.velvetdrive.entities.file.FileService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -62,9 +63,14 @@ public class FolderService {
     }
 
     @Transactional
-    public void moveToBin(String fileName, Folder binFolder, Folder currentFolder) {
-        File beforefile = getFileByName(fileName, currentFolder);
-        File afterFile = new File(fileName, beforefile.getFileSize(), beforefile.getPath(), beforefile.getBackUrl(), binFolder);
+    public void moveToBin(String fileName, Folder binFolder, Folder currentFolder, Drive drive) {
+        File beforeFile;
+        if (currentFolder == null) {
+            List<Folder> folders = drive.getFolderList();
+            currentFolder = folders.stream().filter(a -> fileExistsByName(fileName, a)).findFirst().get();
+        }
+        beforeFile = getFileByName(fileName, currentFolder);
+        File afterFile = new File(fileName, beforeFile.getFileSize(), beforeFile.getPath(), beforeFile.getBackUrl(), binFolder);
         afterFile.setLastFolder(currentFolder.getName());
         binFolder.getFiles().add(afterFile);
         if(binFolder.getFolderSize() != null){
@@ -72,34 +78,46 @@ public class FolderService {
         } else {
             binFolder.setFolderSize(afterFile.getFileSize());
         }
-        currentFolder.setFolderSize(currentFolder.getFolderSize() - beforefile.getFileSize());
+        currentFolder.setFolderSize(currentFolder.getFolderSize() - beforeFile.getFileSize());
         currentFolder.getFiles().removeIf(a -> a.getName().equals(fileName));
     }
 
     @Transactional
     public void moveFromBin(String fileName, Folder binFolder, Drive drive) {
-        File beforefile = getFileByName(fileName, binFolder);
+        File beforeFile = getFileByName(fileName, binFolder);
         Folder toFolder;
-        if(drive.getFolderByName(beforefile.getLastFolder()) != null){
-            toFolder = drive.getFolderByName(beforefile.getLastFolder());
+        if(drive.getFolderByName(beforeFile.getLastFolder()) != null){
+            toFolder = drive.getFolderByName(beforeFile.getLastFolder());
         } else {
             toFolder = drive.getFolderByName("Default");
         }
 
         if(toFolder.getFolderSize() != null){
-            toFolder.setFolderSize(toFolder.getFolderSize() + beforefile.getFileSize());
+            toFolder.setFolderSize(toFolder.getFolderSize() + beforeFile.getFileSize());
         } else {
-            toFolder.setFolderSize(beforefile.getFileSize());
+            toFolder.setFolderSize(beforeFile.getFileSize());
         }
-        File afterFile = new File(fileName, beforefile.getFileSize(), beforefile.getPath(), beforefile.getBackUrl(), toFolder);
+        File afterFile = new File(fileName, beforeFile.getFileSize(), beforeFile.getPath(), beforeFile.getBackUrl(), toFolder);
         toFolder.getFiles().add(afterFile);
         binFolder.getFiles().removeIf(a -> a.getName().equals(fileName));
         binFolder.setFolderSize(binFolder.getFolderSize() - afterFile.getFileSize());
     }
 
-    public File[] getFilesByName(String keyName, Folder folder) {
-        return (File[]) folder.getFiles().stream()
-                .filter(a -> a.getName().toLowerCase().contains(keyName.toLowerCase())).toArray();
+    public Boolean fileExistsByName(String fileName, Folder folder){
+        Optional<File> result = folder.getFiles().stream().filter(a -> a.getName().equals(fileName)).findFirst();
+        return result.isPresent();
     }
 
+    public File getFileByName(String fileName, Folder folder){
+        return folder.getFiles().stream().filter(a -> a.getName().equals(fileName)).findFirst().get();
+    }
+
+    public Boolean fileExistsByKeyname(String keyName, Folder folder) {
+        Optional<File> result = folder.getFiles().stream().filter(a -> a.getName().contains(keyName)).findFirst();
+        return result.isPresent();
+    }
+
+    public List<File> getFilesByKeyname(String keyName, Folder folder) {
+        return folder.getFiles().stream().filter(a -> a.getName().contains(keyName)).toList();
+    }
 }

@@ -1,8 +1,14 @@
 
+html{
+    height: 100%;
+}
+
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(to right, #30E4DD, #3E2C6C);
+    height: 100%;
+    background: linear-gradient(to right, #30E4DD, #3E2C6C) no-repeat;
+    background-size: cover;
 }
 
 main {
@@ -333,7 +339,7 @@ a.socialIcon:hover,
     color: #212529;
     /*margin-left: -90px;*/
     overflow: auto;
-    height: 894px;
+    height: 92vh;
 }
 
 .main-div img {
@@ -589,6 +595,7 @@ background: linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 1
 #search_button:focus,
 #search_input:focus,
 #home_button .btn:focus,
+.restore-button:focus,
 .delete-form button:focus{
     outline: none;
     box-shadow: none;
