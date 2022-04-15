@@ -99,13 +99,15 @@
                 <p th:text="${bigFile} ? 'There is not enough space in your drive!'"></p>
                 <p th:text="${noFile} ? 'You forgot to choose a file for upload!'"></p>
                 <p th:text="${noSuchFile} ? 'No desired file in the current folder!'"></p>
+                <p th:text="${wrongName} ? 'You forgot to enter name, try again!'"></p>
             </div>
             <div class="row row-cols-1 row-cols-md-3 row-cols-xxl-4 align-items-stretch g-4 pb-5">
                 <div class="col" th:each="file: ${files}">
                     <div th:style="'background:linear-gradient(rgba(0, 0, 0, 0.7),rgba(0, 0, 0, 0.7)),url('+ ${file.backUrl} + '),no-repeat center !important; background-size: cover !important;'"
                          class="card file-card card-cover overflow-hidden h-100 text-white bg-dark rounded-5 shadow-lg">
                         <div class="delete-form">
-                            <form th:if="${folder == 'Bin'}" th:action="@{'/deleteFile?file=' + ${file.name} + '&folder=' + ${folder} }" th:method="delete">
+<!--                            <form th:if="${folder == 'Bin'}" th:action="@{'/deleteFile?file=' + ${file.name} + '&folder=' + ${folder} }" th:method="delete">-->
+                            <form th:if="${folder == 'Bin'}" th:action="@{/deleteFile?file=__${file.name}__&folder=__${folder}__}" th:method="delete">
                                 <div class="input-group mb-3">
                                     <button type="submit" class="btn"><i class="fas fa-trash"></i></button>
                                 </div>
@@ -141,7 +143,7 @@
                     </div>
                 </div>
             </div>
-            <div class="create-form create-form-file">
+            <div th:if="${folder} != 'Bin'" class="create-form create-form-file">
                 <a href="" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fas fa-plus-circle"></i></a>
                 <div id="uploadModal" class="modal fade" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
@@ -168,7 +170,8 @@
                 <h1 style="color: aliceblue">Folders</h1>
             </div>
             <div style="margin-bottom: 5px" class="text-danger">
-                <td th:text="${dupFolder} ? 'Folder with such a name already exists!'"></td>
+                <p th:text="${dupFolder} ? 'Folder with such a name already exists!'"></p>
+                <p th:text="${wrongName} ? 'You forgot to enter name, try again!'"></p>
             </div>
             <div class="row row-cols-1 row-cols-md-3 row-cols-xxl-4 align-items-stretch g-4 pb-5">
                 <div class="col" th:each="folder: ${folders}" th:if="${folder.name != 'Bin'}">

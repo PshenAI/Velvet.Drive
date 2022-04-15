@@ -112,12 +112,12 @@ public class FolderService {
         return folder.getFiles().stream().filter(a -> a.getName().equals(fileName)).findFirst().get();
     }
 
-    public Boolean fileExistsByKeyname(String keyName, Folder folder) {
+    public Boolean fileExistsByKeyName(String keyName, Folder folder) {
         Optional<File> result = folder.getFiles().stream().filter(a -> a.getName().contains(keyName)).findFirst();
         return result.isPresent();
     }
 
-    public List<File> getFilesByKeyname(String keyName, Folder folder) {
-        return folder.getFiles().stream().filter(a -> a.getName().contains(keyName)).toList();
+    public List<File> getFilesByKeyName(String keyName, Folder folder) {
+        return folder.getFiles().stream().filter(a -> a.getName().toLowerCase().contains(keyName.toLowerCase())).toList();
     }
 }

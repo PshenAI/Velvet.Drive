@@ -30,9 +30,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 public class MainController {
@@ -65,6 +63,7 @@ public class MainController {
                         @RequestParam(name = "bigFile", required = false, defaultValue = "false") Boolean bigFile,
                         @RequestParam(name = "folderList",required = false, defaultValue = "false") Boolean folderList,
                         @RequestParam(name = "duplicateFolder",required = false, defaultValue = "false") Boolean dupFolder,
+                        @RequestParam(name = "wrongName",required = false, defaultValue = "false") Boolean wrongName,
                         @RequestParam(value = "keyName",required = false, defaultValue = "Default") String keyName){
         DriveUser currentUser = getUser(user, principal);
         Drive currentDrive = currentUser.getDrive();
@@ -72,7 +71,8 @@ public class MainController {
         spaceAllocator(currentUser, model);
 
         setContent(model, folderList,keyName, currentDrive, currentFolder, folderName);
-        
+
+        model.addAttribute("wrongName", wrongName);
         model.addAttribute("noFile", noFile);
         model.addAttribute("user", currentUser);
         model.addAttribute("bigFile", bigFile);
@@ -148,6 +148,10 @@ public class MainController {
     @PostMapping("/createFolder")
     public String createFolder(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal, RedirectAttributes attributes,
                                @RequestParam(name = "folderName") String folderName){
+        if(folderName == null || folderName.equals("")){
+            attributes.addAttribute("wrongName", true);
+            return "redirect:/drive?folderList=true";
+        }
         DriveUser currentUser = getUser(user, principal);
         Drive currentDrive = userService.findByEmail(currentUser.getEmail()).getDrive();
         if(folderService.createFolder(folderName, currentDrive)){
@@ -287,11 +291,11 @@ public class MainController {
 
     private void getFilesByKeyName(String keyName, Drive drive, Model model) {
         List<Folder> folders = drive.getFolderList();
-        folders = folders.stream().filter(a -> folderService.fileExistsByKeyname(keyName, a) != null).toList();
+        folders = folders.stream().filter(a -> folderService.fileExistsByKeyName(keyName, a) != null).toList();
         List<File> resList = new ArrayList<>();
         if(folders != null){
             folders.forEach(a ->{
-                resList.addAll(folderService.getFilesByKeyname(keyName, a));
+                resList.addAll(folderService.getFilesByKeyName(keyName, a));
             });
             model.addAttribute("files", resList);
         } else {
