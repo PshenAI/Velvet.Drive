@@ -105,8 +105,9 @@
                          class="card file-card card-cover overflow-hidden h-100 text-white bg-dark rounded-5 shadow-lg">
                         <div class="delete-form">
 <!--                            <form th:if="${folder == 'Bin'}" th:action="@{'/deleteFile?file=' + ${file.name} + '&folder=' + ${folder} }" th:method="delete">-->
-                            <form th:if="${folder == 'Bin'}" th:action="@{/deleteFile?file=__${file.name}__&folder=__${folder}__}" th:method="delete">
+                            <form th:if="${folder == 'Bin'}" th:action="@{/deleteFile?file=__${file.name}__}" th:method="delete">
                                 <div class="input-group mb-3">
+                                    <input type="hidden" name="folder" th:value="${folder}">
                                     <button type="submit" class="btn"><i class="fas fa-trash"></i></button>
                                 </div>
                             </form>
@@ -151,10 +152,10 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div>
-                                <form  th:action="@{'/uploadFile?folder=' + ${folder}}"  th:method="post" enctype="multipart/form-data">
+                                <form th:action="@{/uploadFile}"  th:method="post" enctype="multipart/form-data">
                                     <div class="input-group mb-3">
                                         <input type="file" name="file" class="form-control">
-<!--                                        <input type="hidden" name="folder" th:value="${curFolder}">-->
+                                        <input type="hidden" name="folder" th:value="${folder}">
                                         <input type="submit" class="input-group-text" value="Add file"/>
                                     </div>
                                 </form>
@@ -188,7 +189,8 @@
                                             <p class="mb-0">All files that were stored here will be deleted alongside.</p>
                                         </div>
                                         <div class="modal-footer flex-nowrap p-0">
-                                            <form th:action="@{'/deleteFolder?folder=' + ${folder.name}}" th:method="delete">
+                                            <form th:action="@{'/deleteFolder'}" th:method="delete">
+                                                <input type="hidden" name="folder" th:value="${folder.name}">
                                                 <button type="submit" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-right" style="float: left"><strong>Yes, I'm sure!</strong></button>
                                                 <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" data-bs-dismiss="modal">Back</button>
                                             </form>
