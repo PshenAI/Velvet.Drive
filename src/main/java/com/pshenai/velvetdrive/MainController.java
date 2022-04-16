@@ -93,8 +93,9 @@ public class MainController {
         fileService.addFile(file, currentFolder, currentFolder.getDrive());
 
         attributes.addAttribute("files", currentFolder.getFiles());
+        attributes.addAttribute("folder", currentFolder.getName());
 
-        return "redirect:/drive?folder=" + currentFolder.getName();
+        return "redirect:/drive";
     }
 
     @GetMapping("/downloadFile")
@@ -114,7 +115,8 @@ public class MainController {
     @PostMapping("/moveToBin")
     public String moveToBin(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
                            @RequestParam(name = "folder", defaultValue = "Default") String folderName,
-                           @RequestParam(name = "file", defaultValue = "Default") String fileName){
+                           @RequestParam(name = "file", defaultValue = "Default") String fileName,
+                            RedirectAttributes attributes){
         DriveUser currentUser = getUser(user, principal);
         Folder currentFolder = getFolder(folderName, currentUser.getEmail());
         Folder binFolder = getFolder("Bin", currentUser.getEmail());
@@ -122,27 +124,35 @@ public class MainController {
         if(currentFolder == null){
             return "redirect:/drive";
         }
-        return "redirect:/drive?folder=" + currentFolder.getName();
+
+        attributes.addAttribute("folder", currentFolder.getName());
+
+        return "redirect:/drive";
     }
 
     @PostMapping("/moveFromBin")
     public String moveFromBin(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
-                            @RequestParam(name = "file", defaultValue = "Default") String fileName){
+                            @RequestParam(name = "file", defaultValue = "Default") String fileName,
+                              RedirectAttributes attributes){
         DriveUser currentUser = getUser(user, principal);
         Folder binFolder = getFolder("Bin", currentUser.getEmail());
         folderService.moveFromBin(fileName, binFolder, currentUser.getDrive());
-        return "redirect:/drive?folder=" + binFolder.getName();
+        attributes.addAttribute("folder",binFolder.getName());
+
+        return "redirect:/drive";
     }
 
     @DeleteMapping("/deleteFile")
     public String deleteFile(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
                              @RequestParam(name = "folder", defaultValue = "Default") String folderName,
-                             @RequestParam(name = "file", defaultValue = "Default") String fileName){
+                             @RequestParam(name = "file", defaultValue = "Default") String fileName,
+                             RedirectAttributes attributes){
         DriveUser currentUser = getUser(user, principal);
         Folder currentFolder = getFolder(folderName, currentUser.getEmail());
         folderService.deleteFile(currentFolder.getFilePath(fileName), currentFolder.getId());
+        attributes.addAttribute("folder", currentFolder.getName());
 
-        return "redirect:/drive?folder=" + currentFolder.getName();
+        return "redirect:/drive";
     }
 
     @PostMapping("/createFolder")
@@ -285,8 +295,8 @@ public class MainController {
             } else {
                 model.addAttribute("files", currentFolder.getFiles());
             }
+            model.addAttribute("folder", folderName);
         }
-        model.addAttribute("folder", folderName);
     }
 
     private void getFilesByKeyName(String keyName, Drive drive, Model model) {

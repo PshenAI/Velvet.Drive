@@ -151,9 +151,10 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div>
-                                <form th:action="@{/uploadFile?folder=__${folder}__}"  th:method="post" enctype="multipart/form-data">
+                                <form  th:action="@{'/uploadFile?folder=' + ${folder}}"  th:method="post" enctype="multipart/form-data">
                                     <div class="input-group mb-3">
                                         <input type="file" name="file" class="form-control">
+<!--                                        <input type="hidden" name="folder" th:value="${curFolder}">-->
                                         <input type="submit" class="input-group-text" value="Add file"/>
                                     </div>
                                 </form>
