@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <head xmlns:th="http://www.thymeleaf.org" lang="en">
-        <title>Velvet | Drive</title>
-        <link rel="icon" type="image/ico" th:href="@{static/images/favicon.ico}">
-        <link href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" rel="stylesheet" >
-        <link href="css/bootstrap.css" rel="stylesheet">
-        <link href="css/styles.css" rel="stylesheet">
-    </head>
+<head xmlns:th="http://www.thymeleaf.org" lang="en">
+    <title>Velvet | Drive</title>
+    <link rel="icon" type="image/ico" th:href="@{static/images/favicon.ico}">
+    <link href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" rel="stylesheet" >
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
 </head>
 <body style="background-image: url(images/bgMainImage.jpg);" th:object="${user}">
 <header class="p-3 bg-dark text-white">
@@ -153,7 +151,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div>
-                                <form th:action="@{'/uploadFile?folder=' + ${folder}}" method="POST" enctype="multipart/form-data">
+                                <form th:action="@{/uploadFile?folder=__${folder}__}"  th:method="post" enctype="multipart/form-data">
                                     <div class="input-group mb-3">
                                         <input type="file" name="file" class="form-control">
                                         <input type="submit" class="input-group-text" value="Add file"/>
@@ -225,7 +223,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div>
-                                <form action="/createFolder" method="POST">
+                                <form th:action="@{/createFolder}" th:method="post">
                                     <div class="form-group">
 <!--                                        <label for="folderName">Folder name</label>-->
                                         <input type="text" class="form-control" id="folderName" name="folderName" placeholder="Folder name">

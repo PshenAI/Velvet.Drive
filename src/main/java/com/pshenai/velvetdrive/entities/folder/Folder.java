@@ -21,7 +21,7 @@ public class Folder {
     private Long id;
 
     private String name;
-    private Double   folderSize;
+    private Double folderSize;
     private String backUrl;
     @ManyToOne
     @JoinColumn(name = "driveId")

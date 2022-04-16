@@ -295,7 +295,9 @@ public class MainController {
         List<File> resList = new ArrayList<>();
         if(folders != null){
             folders.forEach(a ->{
-                resList.addAll(folderService.getFilesByKeyName(keyName, a));
+                if(!a.getName().equals("Bin")){
+                    resList.addAll(folderService.getFilesByKeyName(keyName, a));
+                }
             });
             model.addAttribute("files", resList);
         } else {
