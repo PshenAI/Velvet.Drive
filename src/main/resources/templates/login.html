@@ -27,11 +27,11 @@
                     <!--                    <a class="forgot text-muted" href="#">Forgot password?</a>-->
                     <input id="submit" type="submit" value="Log In">
                     <div style="margin-bottom: 5px" class="text-danger">
-                        <td th:text="${error} ? 'Wrong login or password. Please, try again.'"></td>
+                        <p th:text="${error} ? 'Wrong login or password. Please, try again.'"></p>
                     </div>
                     <div style="margin-bottom: 5px" class="text-light">
-                        <td th:text="${successRegistration} ? 'Registration was successful!'"></td>
-                        <td th:text="${logout} ? 'Logout was successful.'"></td>
+                        <p th:text="${successRegistration} ? 'Registration was successful!'"></p>
+                        <p th:text="${logout} ? 'Logout was successful.'"></p>
                     </div>
                     <div class="col-md-12">
                         <ul class="social-network social-circle">

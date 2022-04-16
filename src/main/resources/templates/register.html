@@ -27,9 +27,9 @@
                     <p><input id="confirmPassword" type="password"  name="confirmPassword" placeholder="Confirm Password"></p>
                     <!--                    <a class="forgot text-muted" href="#">Forgot password?</a>-->
                     <div style="margin-bottom: 5px" class="text-danger">
-                        <td th:text="${emailExists} ? 'This email is already in use. Please, try another one.':''"></td>
-                        <td th:text="${wrongEmail} ? 'This email is not valid. ' : ''"></td>
-                        <td th:text="${samePassword} ? 'Passwords do not match. Please, try again.' : ''"></td>
+                        <p th:text="${emailExists} ? 'This email is already in use. Please, try another one.':''"></p>
+                        <p th:text="${wrongEmail} ? 'This email is not valid. ' : ''"></p>
+                        <p th:text="${samePassword} ? 'Passwords do not match. Please, try again.' : ''"></p>
                     </div>
                     <p><input id="submit" type="submit" value="Sign Up"></p>
                     <div class="col-md-12">
