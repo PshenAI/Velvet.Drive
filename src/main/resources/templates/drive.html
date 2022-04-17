@@ -178,21 +178,23 @@
                     <div th:style="'background:linear-gradient(rgba(0, 0, 0, 0.7),rgba(0, 0, 0, 0.7)),url('+ ${folder.backUrl} + '),no-repeat center !important; background-size: cover !important; cursor: pointer;'"
                          class="card folder-card card-cover h-100 overflow-hidden text-white bg-dark rounded-5 shadow-lg">
                         <div th:if="${folder.name != 'Default'}" class="delete-form">
-                            <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <button type="button" class="btn" data-bs-toggle="modal" th:data-bs-target="'#delete' + ${folder.id}">
                                 <i class="fas fa-trash"></i>
                             </button>
-                            <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal fade" th:id="'delete' + ${folder.id}" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content rounded-4 shadow" style="color: #434462">
                                         <div class="modal-body p-4 text-center">
                                             <h5 class="mb-0">Are you sure?</h5>
-                                            <p class="mb-0">All files that were stored here will be deleted alongside.</p>
+                                            <p style="margin-top: 10px;" class="mb-0">All files that were stored here will be deleted alongside.</p>
                                         </div>
                                         <div class="modal-footer flex-nowrap p-0">
-                                            <form th:action="@{'/deleteFolder'}" th:method="delete">
+                                            <form th:action="@{/deleteFolder}" th:method="delete" style="width: 100%;">
                                                 <input type="hidden" name="folder" th:value="${folder.name}">
-                                                <button type="submit" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-right" style="float: left"><strong>Yes, I'm sure!</strong></button>
-                                                <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" data-bs-dismiss="modal">Back</button>
+                                                <button type="submit" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-right"
+                                                        style="float: left; color: #434462;"><strong>Yes, I'm sure!</strong></button>
+                                                <button style="color: #434462;" type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0"
+                                                        data-bs-dismiss="modal">Back</button>
                                             </form>
                                         </div>
                                     </div>

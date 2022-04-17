@@ -516,17 +516,6 @@ background: linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 1
     margin: -13px -40px;
 }
 
-#deleteModal form {
-    width: 100%;
-}
-#deleteModal button {
-    color: #434462;
-}
-
-#deleteModal p {
-    margin-top: 10px;
-}
-
 #space_text {
     text-align: center;
     font-size: 36px;
