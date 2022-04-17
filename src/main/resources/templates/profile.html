@@ -47,8 +47,8 @@
                                                     <form th:action="@{'/updateProfile'}" th:method="put">
                                                         <div class="form-group">
                                                             <input type="text" class="form-control" th:value="${user.fullName}" id="name" name="newName" placeholder="Name">
-                                                            <input type="password" class="form-control" id="oldPassword" name="oldPassword" placeholder="Old password">
-                                                            <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="New password">
+                                                            <input th:if="${oauthUser != true}" type="password" class="form-control" id="oldPassword" name="oldPassword" placeholder="Old password">
+                                                            <input th:if="${oauthUser != true}" type="password" class="form-control" id="newPassword" name="newPassword" placeholder="New password">
                                                         </div>
 
                                                         <div class="modal-footer">

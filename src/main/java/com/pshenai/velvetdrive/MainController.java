@@ -74,7 +74,6 @@ public class MainController {
         spaceAllocator(currentUser, model);
 
         setContent(model, folderList,keyName, currentDrive, currentFolder, folderName);
-
         model.addAttribute("wrongName", wrongName);
         model.addAttribute("noFile", noFile);
         model.addAttribute("user", currentUser);
@@ -207,6 +206,11 @@ public class MainController {
                           @RequestParam(name = "sameSurname", required = false, defaultValue = "false") Boolean sameSurname){
         DriveUser currentUser = getUser(user, principal);
         spaceAllocator(currentUser, model);
+
+        if(principal != null){
+            model.addAttribute("oauthUser", true);
+        }
+
         model.addAttribute("user", currentUser);
         model.addAttribute("fileNumber", fileCounter(currentUser));
         model.addAttribute("samePassword", samePassword);
