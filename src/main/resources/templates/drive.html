@@ -104,15 +104,17 @@
                     <div th:style="'background:linear-gradient(rgba(0, 0, 0, 0.7),rgba(0, 0, 0, 0.7)),url('+ ${file.backUrl} + '),no-repeat center !important; background-size: cover !important;'"
                          class="card file-card card-cover overflow-hidden h-100 text-white bg-dark rounded-5 shadow-lg">
                         <div class="delete-form">
-<!--                            <form th:if="${folder == 'Bin'}" th:action="@{'/deleteFile?file=' + ${file.name} + '&folder=' + ${folder} }" th:method="delete">-->
-                            <form th:if="${folder == 'Bin'}" th:action="@{/deleteFile?file=__${file.name}__}" th:method="delete">
+                            <form th:if="${folder == 'Bin'}" th:action="@{/deleteFile}" th:method="delete">
                                 <div class="input-group mb-3">
                                     <input type="hidden" name="folder" th:value="${folder}">
+                                    <input type="hidden" name="file" th:value="${file.name}">
                                     <button type="submit" class="btn"><i class="fas fa-trash"></i></button>
                                 </div>
                             </form>
-                            <form th:if="${folder != 'Bin'}" th:action="@{'/moveToBin?file=' + ${file.name} + '&folder=' + ${folder} }" method="post">
+                            <form th:if="${folder != 'Bin'}" th:action="@{/moveToBin}" method="post">
                                 <div class="input-group mb-3">
+                                    <input type="hidden" name="folder" th:value="${folder}">
+                                    <input type="hidden" name="file" th:value="${file.name}">
                                     <button type="submit" class="btn"><i class="fas fa-trash"></i></button>
                                 </div>
                             </form>
@@ -126,9 +128,10 @@
                                 <li class="d-flex align-items-center me-3">
                                     <a th:if="${folder != 'Bin'}" th:href="@{'/downloadFile?file=' + ${file.name}}"><i class="fas fa-download"></i></a>
                                     <div th:if="${folder == 'Bin'}">
-                                        <form th:action="@{'/moveFromBin?file=' + ${file.name}}" method="post">
+                                        <form th:action="@{/moveFromBin}" method="post">
                                             <div class="input-group mb-3">
-                                                <button type="submit" class="btn restore-button"><i class="fas fa-trash-restore"></i></button>
+                                                <input type="hidden" name="file" th:value="${file.name}">
+                                                <button style="margin-left: -40px" type="submit" class="btn restore-button"><i class="fas fa-trash-restore"></i></button>
                                             </div>
                                         </form>
                                     </div>
