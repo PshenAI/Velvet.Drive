@@ -18,7 +18,7 @@ public class StorageManager {
         this.storageService = storageService;
     }
 
-    public void setDriveStorage(Drive drive) throws NullPointerException{
+    public void setDriveStorage(Drive drive) throws NullPointerException{ //sets a storage to drive
         storages = storageService.getAllStorages();
         Storage res;
         Optional<Storage> optionalStorage = storages.stream().filter(s -> {

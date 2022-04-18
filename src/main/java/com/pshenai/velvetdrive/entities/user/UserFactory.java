@@ -20,7 +20,7 @@ public class UserFactory {
         this.storageManager = storageManager;
     }
 
-    public DriveUser createUser(String email, String passHash,
+    public void createUser(String email, String passHash,
                            UserRole role, String fullName, String pictureUrl){
         if(pictureUrl == null) pictureUrl = "images/backs/tori.jpg";
         DriveUser user = new DriveUser(email, passHash, role, fullName, pictureUrl);
@@ -35,6 +35,5 @@ public class UserFactory {
         user.setDrive(drive);
 
         userService.addUser(user);
-        return user;
     }
 }

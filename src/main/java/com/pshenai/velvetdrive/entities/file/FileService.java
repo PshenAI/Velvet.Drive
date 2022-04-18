@@ -56,7 +56,7 @@ public class FileService {
     private void upload(String path,
                        String fileName,
                        Optional<Map<String, String>> optionalMetaData,
-                       InputStream inputStream) {
+                       InputStream inputStream) { //uploads a file directly to Amazon S3
         ObjectMetadata objectMetadata = new ObjectMetadata();
         optionalMetaData.ifPresent(map -> {
             if (!map.isEmpty()) {
@@ -83,7 +83,7 @@ public class FileService {
         }
     }
 
-    private String[] setPathAndName(Drive drive, MultipartFile file) {
+    private String[] setPathAndName(Drive drive, MultipartFile file) { //makes each file path and name unique
         String initialPath = drive.getDrivePath() + file.getOriginalFilename();
         String filePath = drive.getDriveUser().getEmail() + "/" + file.getOriginalFilename();
         int count = 1;

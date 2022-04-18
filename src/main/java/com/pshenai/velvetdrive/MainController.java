@@ -13,7 +13,6 @@ import com.pshenai.velvetdrive.entities.user.UserRole;
 import com.pshenai.velvetdrive.entities.user.UserService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.apache.tomcat.util.digester.DocumentProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -29,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -293,7 +291,7 @@ public class MainController {
     }
 
     private void setContent(Model model, Boolean folderList, String keyName, Drive currentDrive, Folder currentFolder,
-                            String folderName) {
+                            String folderName) { //fills drive page with content depending on request parameters
         if(folderList){
             model.addAttribute("folders",currentDrive.getFolderList());
         } else {
@@ -329,7 +327,7 @@ public class MainController {
         return drive.getFolderList().stream().mapToInt(a -> a.getFiles().size()).sum();
     }
 
-    private void spaceAllocator(DriveUser currentUser, Model model){
+    private void spaceAllocator(DriveUser currentUser, Model model){ //returns progress (space) bar info
         String[] driveSpaces = new String[3];
         DecimalFormat dFormat = new DecimalFormat("##.#");
         driveSpaces[0] = dFormat.format((currentUser.getDrive().getDrivePlan().getSpace()));
