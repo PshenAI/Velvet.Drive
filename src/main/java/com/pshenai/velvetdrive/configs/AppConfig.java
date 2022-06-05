@@ -35,7 +35,7 @@ public class AppConfig {
                 Storage mainStorage = new Storage("velvet-drive-storage",1_048_576L,0L);
                 storageService.addStorage(mainStorage);
                 factory.createUser("admin", encoder.encode("admin"),
-                        UserRole.ADMIN, "Velvet Velvetov",null);
+                        UserRole.ADMIN, "Velvet Adminov",null);
 //                factory.createUser("user", encoder.encode("user"),
 //                        UserRole.USER, "Lavender Lavenderov",null);
             }
