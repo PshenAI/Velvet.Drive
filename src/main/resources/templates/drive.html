@@ -104,14 +104,14 @@
                     <div th:style="'background:linear-gradient(rgba(0, 0, 0, 0.7),rgba(0, 0, 0, 0.7)),url('+ ${file.backUrl} + '),no-repeat center !important; background-size: cover !important;'"
                          class="card file-card card-cover overflow-hidden h-100 text-white bg-dark rounded-5 shadow-lg">
                         <div class="delete-form">
-                            <form th:if="${folder == 'Bin'}" th:action="@{/deleteFile}" th:method="delete">
+                            <form th:if="${folder == 'Bin'}" th:action="@{/file/delete}" th:method="delete">
                                 <div class="input-group mb-3">
                                     <input type="hidden" name="folder" th:value="${folder}">
                                     <input type="hidden" name="file" th:value="${file.name}">
                                     <button type="submit" class="btn"><i class="fas fa-trash"></i></button>
                                 </div>
                             </form>
-                            <form th:if="${folder != 'Bin'}" th:action="@{/moveToBin}" method="post">
+                            <form th:if="${folder != 'Bin'}" th:action="@{/bin/insert}" method="post">
                                 <div class="input-group mb-3">
                                     <input type="hidden" name="folder" th:value="${folder}">
                                     <input type="hidden" name="file" th:value="${file.name}">
@@ -128,7 +128,7 @@
                                 <li class="d-flex align-items-center me-3">
                                     <a th:if="${folder != 'Bin'}" th:href="@{'/downloadFile?file=' + ${file.name}}"><i class="fas fa-download"></i></a>
                                     <div th:if="${folder == 'Bin'}">
-                                        <form th:action="@{/moveFromBin}" method="post">
+                                        <form th:action="@{/bin/extract}" method="post">
                                             <div class="input-group mb-3">
                                                 <input type="hidden" name="file" th:value="${file.name}">
                                                 <button style="margin-left: -40px" type="submit" class="btn restore-button"><i class="fas fa-trash-restore"></i></button>
@@ -155,7 +155,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div>
-                                <form th:action="@{/uploadFile}"  th:method="post" enctype="multipart/form-data">
+                                <form th:action="@{/file/upload}"  th:method="post" enctype="multipart/form-data">
                                     <div class="input-group mb-3">
                                         <input type="file" name="file" class="form-control">
                                         <input type="hidden" name="folder" th:value="${folder}">
@@ -192,7 +192,7 @@
                                             <p style="margin-top: 10px;" class="mb-0">All files that were stored here will be deleted alongside.</p>
                                         </div>
                                         <div class="modal-footer flex-nowrap p-0">
-                                            <form th:action="@{/deleteFolder}" th:method="delete" style="width: 100%;">
+                                            <form th:action="@{/folder/delete}" th:method="delete" style="width: 100%;">
                                                 <input type="hidden" name="folder" th:value="${folder.name}">
                                                 <button type="submit" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-right"
                                                         style="float: left; color: #434462;"><strong>Yes, I'm sure!</strong></button>
@@ -231,7 +231,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div>
-                                <form th:action="@{/createFolder}" th:method="post">
+                                <form th:action="@{/folder/create}" th:method="post">
                                     <div class="form-group">
 <!--                                        <label for="folderName">Folder name</label>-->
                                         <input type="text" class="form-control" id="folderName" name="folderName" placeholder="Folder name">
