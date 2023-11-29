@@ -2,9 +2,11 @@ package com.pshenai.velvetdrive.controllers;
 
 import com.pshenai.velvetdrive.common.CommonUtil;
 import com.pshenai.velvetdrive.entities.drive.Drive;
+import com.pshenai.velvetdrive.entities.drive.DriveAO;
 import com.pshenai.velvetdrive.entities.drive.DrivePlan;
 import com.pshenai.velvetdrive.entities.drive.DriveService;
 import com.pshenai.velvetdrive.entities.file.File;
+import com.pshenai.velvetdrive.entities.file.FileAO;
 import com.pshenai.velvetdrive.entities.file.FileService;
 import com.pshenai.velvetdrive.entities.folder.Folder;
 import com.pshenai.velvetdrive.entities.folder.FolderService;
@@ -47,35 +49,27 @@ public class DriveController {
         this.fileService = fileService;
         this.commonUtil = commonUtil;
     }
-
     @GetMapping("/drive")
     public String drive(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal, Model model,
-                        @RequestParam(value = "folder",required = false, defaultValue = "Default") String folderName,
-                        @RequestParam(value = "noFile",required = false, defaultValue = "false") String noFile,
-                        @RequestParam(name = "bigFile", required = false, defaultValue = "false") Boolean bigFile,
-                        @RequestParam(name = "folderList",required = false, defaultValue = "false") Boolean folderList,
-                        @RequestParam(name = "duplicateFolder",required = false, defaultValue = "false") Boolean dupFolder,
-                        @RequestParam(name = "wrongName",required = false, defaultValue = "false") Boolean wrongName,
-                        @RequestParam(value = "keyName",required = false, defaultValue = "Default") String keyName){
+                        DriveAO driveAO){
         DriveUser currentUser = commonUtil.getUser(user, principal);
         Drive currentDrive = currentUser.getDrive();
-        Folder currentFolder = getFolder(folderName, currentUser.getEmail());
+        Folder currentFolder = getFolder(driveAO.getFolder(), currentUser.getEmail());
         commonUtil.spaceAllocator(currentUser, model);
 
-        setContent(model, folderList,keyName, currentDrive, currentFolder, folderName);
-        model.addAttribute("wrongName", wrongName);
-        model.addAttribute("noFile", noFile);
+        setContent(model, driveAO.isFolderList(),driveAO.getKeyName(), currentDrive, currentFolder, driveAO.getFolder());
+        model.addAttribute("wrongName", driveAO.isWrongName());
+        model.addAttribute("noFile", driveAO.isNoFile());
         model.addAttribute("user", currentUser);
-        model.addAttribute("bigFile", bigFile);
-        model.addAttribute("dupFolder", dupFolder);
+        model.addAttribute("bigFile", driveAO.isBigFile());
+        model.addAttribute("dupFolder", driveAO.isDuplicateFolder());
         return "drive";
     }
 
     @PostMapping("/file/upload")
     public String uploadFile(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal, RedirectAttributes attributes,
                          @RequestParam("file")MultipartFile file,
-                         @RequestParam(name = "folder", defaultValue = "Default") String folderName)
-            throws IOException {
+                         @RequestParam(name = "folder", defaultValue = "Default") String folderName) throws IOException {
         DriveUser currentUser = commonUtil.getUser(user, principal);
         Folder currentFolder = getFolder(folderName, currentUser.getEmail());
         if(!fileCheck(file, currentUser.getEmail(), attributes)){
@@ -91,15 +85,14 @@ public class DriveController {
 
     @GetMapping("/file/download")
     public ResponseEntity<String> getFile(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
-                                          @RequestParam(value = "file") String fileName)
-            throws IOException {
+                                          FileAO fileAO) throws IOException {
         HttpHeaders httpHeaders = new HttpHeaders();
         DriveUser currentUser = commonUtil.getUser(user, principal);
 
-        com.pshenai.velvetdrive.entities.file.File file = fileService.getFileByName(currentUser.getEmail(), fileName);
+        com.pshenai.velvetdrive.entities.file.File file = fileService.getFileByName(currentUser.getEmail(), fileAO.getFile());
         httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
         httpHeaders.setContentDispositionFormData("attachment",
-                new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+                new String(fileAO.getFile().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
 //        return ResponseEntity.ok().headers(httpHeaders)
 //                .body(IOUtils.toByteArray(fileService.getFileInputStream(file.getPath())));
 
@@ -109,12 +102,10 @@ public class DriveController {
 
     @DeleteMapping("/file/delete")
     public String deleteFile(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
-                             @RequestParam(name = "folder", defaultValue = "Default") String folderName,
-                             @RequestParam(name = "file", defaultValue = "Default") String fileName,
-                             RedirectAttributes attributes){
+                             RedirectAttributes attributes, FileAO fileAO){
         DriveUser currentUser = commonUtil.getUser(user, principal);
-        Folder currentFolder = getFolder(folderName, currentUser.getEmail());
-        folderService.deleteFile(currentFolder.getFilePath(fileName), currentFolder.getId());
+        Folder currentFolder = getFolder(fileAO.getFolder(), currentUser.getEmail());
+        folderService.deleteFile(currentFolder.getFilePath(fileAO.getFile()), currentFolder.getId());
         attributes.addAttribute("folder", currentFolder.getName());
 
         return "redirect:/drive";
@@ -122,13 +113,11 @@ public class DriveController {
 
     @PostMapping("/bin/insert")
     public String moveToBin(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
-                           @RequestParam(name = "folder", defaultValue = "Default") String folderName,
-                           @RequestParam(name = "file", defaultValue = "Default") String fileName,
-                            RedirectAttributes attributes){
+                            RedirectAttributes attributes, FileAO fileAO){
         DriveUser currentUser = commonUtil.getUser(user, principal);
-        Folder currentFolder = getFolder(folderName, currentUser.getEmail());
+        Folder currentFolder = getFolder(fileAO.getFolder(), currentUser.getEmail());
         Folder binFolder = getFolder("Bin", currentUser.getEmail());
-        folderService.moveToBin(fileName, binFolder, currentFolder, currentUser.getDrive());
+        folderService.moveToBin(fileAO.getFile(), binFolder, currentFolder, currentUser.getDrive());
         if(currentFolder == null){
             return "redirect:/drive";
         }
@@ -140,11 +129,10 @@ public class DriveController {
 
     @PostMapping("/bin/extract")
     public String moveFromBin(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
-                            @RequestParam(name = "file", defaultValue = "Default") String fileName,
-                              RedirectAttributes attributes){
+                              RedirectAttributes attributes, FileAO fileAO){
         DriveUser currentUser = commonUtil.getUser(user, principal);
         Folder binFolder = getFolder("Bin", currentUser.getEmail());
-        folderService.moveFromBin(fileName, binFolder, currentUser.getDrive());
+        folderService.moveFromBin(fileAO.getFile(), binFolder, currentUser.getDrive());
         attributes.addAttribute("folder",binFolder.getName());
 
         return "redirect:/drive";
