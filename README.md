@@ -6,7 +6,7 @@ This is a file storage service - diploma project for my courses. Login - admin. 
 This project is dockerized, but to boot the project successfully via docker you need to follow a few simple steps.
 1. Switch to a **`dockerized_branch`** branch in github.
 2. Execute `mvn clean package -DskipTests` to build an executable jar file.
-3. Finally, `run docker compose up`.
+3. Finally, run `docker compose up`.
 
 ## P.S.
 Currently, heroku and aws support are not working, as my free trials ended, 
