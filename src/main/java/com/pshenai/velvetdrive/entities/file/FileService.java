@@ -23,11 +23,15 @@ import java.util.Random;
 public class FileService {
 
     private final FileRepository fileRepository;
-    private final AmazonS3 amazonS3;
+//    private final AmazonS3 amazonS3;
 
-    public FileService(FileRepository fileRepository, AmazonS3 amazonS3) {
+//    public FileService(FileRepository fileRepository, AmazonS3 amazonS3) {
+//        this.fileRepository = fileRepository;
+//        this.amazonS3 = amazonS3;
+//    }
+
+    public FileService(FileRepository fileRepository) {
         this.fileRepository = fileRepository;
-        this.amazonS3 = amazonS3;
     }
 
     @Transactional
@@ -64,16 +68,16 @@ public class FileService {
             }
         });
         try {
-            amazonS3.putObject(path, fileName, inputStream, objectMetadata);
+//            amazonS3.putObject(path, fileName, inputStream, objectMetadata);
         } catch (AmazonServiceException e) {
             throw new IllegalStateException("Failed to upload the file", e);
         }
     }
 
-    public S3ObjectInputStream getFileInputStream(String path) {
-        S3Object s3Object = amazonS3.getObject(BucketName.MAIN_BUCKET.getBucketName(), path);
-        return s3Object.getObjectContent();
-    }
+//    public S3ObjectInputStream getFileInputStream(String path) {
+//        S3Object s3Object = amazonS3.getObject(BucketName.MAIN_BUCKET.getBucketName(), path);
+//        return s3Object.getObjectContent();
+//    }
 
     private void setFolderSize(Folder folder, Double fileSize){
         if(folder.getFolderSize() == null){
