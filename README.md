@@ -1,16 +1,22 @@
 # Velvet | Drive
 
-This is a file storage service - diploma project for my courses. Login - admin. Password - admin. Or you can try oauth2 on the site itself - https://velvet-drive.herokuapp.com.
-(May take a little while to boot!)
+This is a file storage service - diploma project for my courses. Login - admin. Password - admin. 
 
-This project is dockerized, but to boot the project successfully via docker you need to follow a few simple steps.
-1. Switch to a **`dockerized_branch`** branch in github.
-2. Execute `mvn clean package -DskipTests` to build an executable jar file.
-3. Finally, run `docker compose up`.
+~~You can try oauth2 on the site itself - https://velvet-drive.herokuapp.com.~~
+**(Unavailable now!)**
+
+This project is dockerized, you can launch containers with project and database by running this command from the root of the project:
+
+`docker compose up`
+
+You can then open the site by accessing it via http://localhost:8888/.
 
 ## P.S.
-Currently, heroku and aws support are not working, as my free trials ended, 
-so dockerized and local versions have all AWS S3 logic commented out. 
+Currently, heroku and aws support are not working, as my free trials ended,
+so for now project have all AWS S3 logic commented out.
 
-But still you can look up the code and click the site through.
-As of now, I'm working on a different solution in my free time.
+But still you can look up the code and click the site through by launching it locally - by uncommenting the h2 database section.
+
+Or you can run it via docker containers.
+
+As of now, I'm working on a different solution for data storing in my free time.
