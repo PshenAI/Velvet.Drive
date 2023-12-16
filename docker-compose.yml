@@ -2,7 +2,7 @@ version: '2'
 
 services:
   app:
-    image: 'velvet-drive:latest'
+    image: 'sicyaas/velvet-drive:latest'
     build:
       context: .
     ports:
