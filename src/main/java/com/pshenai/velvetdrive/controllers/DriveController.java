@@ -12,6 +12,7 @@ import com.pshenai.velvetdrive.entities.folder.Folder;
 import com.pshenai.velvetdrive.entities.folder.FolderService;
 import com.pshenai.velvetdrive.entities.user.DriveUser;
 import com.pshenai.velvetdrive.entities.user.UserService;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -84,7 +85,7 @@ public class DriveController {
     }
 
     @GetMapping("/file/download")
-    public ResponseEntity<String> getFile(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
+    public ResponseEntity<byte[]> getFile(@AuthenticationPrincipal User user, @AuthenticationPrincipal OAuth2User principal,
                                           FileAO fileAO) throws IOException {
         HttpHeaders httpHeaders = new HttpHeaders();
         DriveUser currentUser = commonUtil.getUser(user, principal);
@@ -93,11 +94,8 @@ public class DriveController {
         httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
         httpHeaders.setContentDispositionFormData("attachment",
                 new String(fileAO.getFile().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
-//        return ResponseEntity.ok().headers(httpHeaders)
-//                .body(IOUtils.toByteArray(fileService.getFileInputStream(file.getPath())));
-
         return ResponseEntity.ok().headers(httpHeaders)
-                .body("Biba");
+                .body(IOUtils.toByteArray(fileService.getFileInputStream(file.getPath())));
     }
 
     @DeleteMapping("/file/delete")
@@ -105,7 +103,7 @@ public class DriveController {
                              RedirectAttributes attributes, FileAO fileAO){
         DriveUser currentUser = commonUtil.getUser(user, principal);
         Folder currentFolder = getFolder(fileAO.getFolder(), currentUser.getEmail());
-        folderService.deleteFile(currentFolder.getFilePath(fileAO.getFile()), currentFolder.getId());
+        fileService.deleteFile(currentFolder.getFilePath(fileAO.getFile()), currentFolder.getId());
         attributes.addAttribute("folder", currentFolder.getName());
 
         return "redirect:/drive";

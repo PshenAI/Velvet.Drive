@@ -15,28 +15,11 @@ import java.util.Optional;
 public class FolderService {
 
     private final FolderRepository folderRepository;
-//    private final AmazonS3 amazonS3;
+    private final AmazonS3 amazonS3;
 
-//    public FolderService(FolderRepository folderRepository, AmazonS3 amazonS3) {
-//        this.folderRepository = folderRepository;
-//        this.amazonS3 = amazonS3;
-//    }
-
-    public FolderService(FolderRepository folderRepository) {
+    public FolderService(FolderRepository folderRepository, AmazonS3 amazonS3) {
         this.folderRepository = folderRepository;
-    }
-
-
-    @Transactional
-    public void deleteFile(String filePath, Long folderId){
-        Folder folder= folderRepository.findById(folderId).get();
-        File file = folder.getFiles().stream().filter(a -> a.getPath().equals(filePath)).findFirst().get();
-//        amazonS3.deleteObject(BucketName.MAIN_BUCKET.getBucketName(), file.getPath());
-        folder.getFiles().removeIf(a -> a.equals(file));
-        Drive drive = folder.getDrive();
-
-        folder.setFolderSize(folder.getFolderSize() - file.getFileSize());
-        drive.setSpaceLeft(drive.getSpaceLeft() + file.getFileSize());
+        this.amazonS3 = amazonS3;
     }
 
     @Transactional
@@ -56,7 +39,7 @@ public class FolderService {
             Folder folder = folderOptional.get();
             Drive drive = folder.getDrive();
             folder.getFiles().forEach(a ->{
-//                amazonS3.deleteObject(BucketName.MAIN_BUCKET.getBucketName(), a.getPath());
+                amazonS3.deleteObject(BucketName.MAIN_BUCKET.getBucketName(), a.getPath());
             });
             drive.getFolderList().removeIf(a -> a.getId().equals(folderId));
             if(folder.getFolderSize() != null){

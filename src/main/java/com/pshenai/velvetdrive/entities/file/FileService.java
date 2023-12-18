@@ -1,6 +1,5 @@
 package com.pshenai.velvetdrive.entities.file;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
@@ -8,43 +7,40 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.pshenai.velvetdrive.configs.BucketName;
 import com.pshenai.velvetdrive.entities.drive.Drive;
 import com.pshenai.velvetdrive.entities.folder.Folder;
+import com.pshenai.velvetdrive.entities.folder.FolderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 
 @Service
 public class FileService {
 
     private final FileRepository fileRepository;
-//    private final AmazonS3 amazonS3;
 
-//    public FileService(FileRepository fileRepository, AmazonS3 amazonS3) {
-//        this.fileRepository = fileRepository;
-//        this.amazonS3 = amazonS3;
-//    }
+    private final FolderRepository folderRepository;
+    private final AmazonS3 amazonS3;
 
-    public FileService(FileRepository fileRepository) {
+    public FileService(FileRepository fileRepository, FolderRepository folderRepository, AmazonS3 amazonS3) {
         this.fileRepository = fileRepository;
+        this.folderRepository = folderRepository;
+        this.amazonS3 = amazonS3;
     }
 
     @Transactional
     public void addFile(MultipartFile file, Folder folder, Drive drive) throws IOException {
         String[] initialPath = setPathAndName(drive, file);
-        Map<String, String> metadata = new HashMap<>();
-        metadata.put("Content-Type", file.getContentType());
-        metadata.put("Content-Length", String.valueOf(file.getSize()));
         Double fileSize = ((double)file.getSize())/1_048_576;
         com.pshenai.velvetdrive.entities.file.File driveFile =
                 new com.pshenai.velvetdrive.entities.file.File(initialPath[2],
                        fileSize , initialPath[1] + "/" + initialPath[2], setBackground(), folder);
-        upload(initialPath[0] + "/" + initialPath[1], initialPath[2], Optional.of(metadata),file.getInputStream());
+
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentType(file.getContentType());
+        objectMetadata.setContentLength(file.getSize());
+        amazonS3.putObject(initialPath[0] + "/" + initialPath[1], initialPath[2], file.getInputStream(), objectMetadata);
         fileRepository.save(driveFile);
 
         setFolderSize(folder, fileSize);
@@ -57,27 +53,22 @@ public class FileService {
         return fileRepository.findByPath(filePath);
     }
 
-    private void upload(String path,
-                       String fileName,
-                       Optional<Map<String, String>> optionalMetaData,
-                       InputStream inputStream) { //uploads a file directly to Amazon S3
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        optionalMetaData.ifPresent(map -> {
-            if (!map.isEmpty()) {
-                map.forEach(objectMetadata::addUserMetadata);
-            }
-        });
-        try {
-//            amazonS3.putObject(path, fileName, inputStream, objectMetadata);
-        } catch (AmazonServiceException e) {
-            throw new IllegalStateException("Failed to upload the file", e);
-        }
+    @Transactional
+    public void deleteFile(String filePath, Long folderId){
+        Folder folder= folderRepository.findById(folderId).get();
+        File file = folder.getFiles().stream().filter(a -> a.getPath().equals(filePath)).findFirst().get();
+        amazonS3.deleteObject(BucketName.MAIN_BUCKET.getBucketName(), file.getPath());
+        folder.getFiles().removeIf(a -> a.equals(file));
+        Drive drive = folder.getDrive();
+
+        folder.setFolderSize(folder.getFolderSize() - file.getFileSize());
+        drive.setSpaceLeft(drive.getSpaceLeft() + file.getFileSize());
     }
 
-//    public S3ObjectInputStream getFileInputStream(String path) {
-//        S3Object s3Object = amazonS3.getObject(BucketName.MAIN_BUCKET.getBucketName(), path);
-//        return s3Object.getObjectContent();
-//    }
+    public S3ObjectInputStream getFileInputStream(String path) {
+        S3Object s3Object = amazonS3.getObject(BucketName.MAIN_BUCKET.getBucketName(), path);
+        return s3Object.getObjectContent();
+    }
 
     private void setFolderSize(Folder folder, Double fileSize){
         if(folder.getFolderSize() == null){

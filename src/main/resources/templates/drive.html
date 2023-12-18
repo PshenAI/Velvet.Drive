@@ -126,7 +126,7 @@
                                     <img th:src="${user.pictureUrl}" width="32" height="32" class="rounded-circle border border-white">
                                 </li>
                                 <li class="d-flex align-items-center me-3">
-                                    <a th:if="${folder != 'Bin'}" th:href="@{'/downloadFile?file=' + ${file.name}}"><i class="fas fa-download"></i></a>
+                                    <a th:if="${folder != 'Bin'}" th:href="@{'/file/download?file=' + ${file.name}}"><i class="fas fa-download"></i></a>
                                     <div th:if="${folder == 'Bin'}">
                                         <form th:action="@{/bin/extract}" method="post">
                                             <div class="input-group mb-3">
