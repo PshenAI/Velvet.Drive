@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
+@RestController
 public class DriveController {
 
     private final UserService userService;
